@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "tauri-app",
+    "productName": "Phil's Dictation App",
     "version": "0.0.0"
   },
   "tauri": {
@@ -20,7 +20,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri-phil.dev",
+      "identifier": "com.tauri-philsdictationapp.dev",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
@@ -36,7 +36,7 @@
       {
         "fullscreen": false,
         "resizable": true,
-        "title": "tauri-app",
+        "title": "Phil's Dictation App",
         "width": 800,
         "height": 600
       }

@@ -13,8 +13,8 @@ function App() {
   }
 
   return (
-    <div className="container">
-      <h1>Welcome to Tauri!</h1>
+    <div className="container mx-auto px-4 py-2">
+      <h1 className="text-xl text-center">Welcome to Phil's Dictation App!</h1>
 
       <div className="row">
         <a href="https://vitejs.dev" target="_blank">
