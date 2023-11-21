@@ -1,13 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 // import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 import { Buttons } from "./components/Buttons";
+import { startWindToast } from "@mariojgt/wind-notify/packages/index.js";
 
 function App() {
   const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
     "off"
   );
+
+  useEffect(() => {
+    startWindToast("title", "message", "success", 2, "top");
+    navigator.clipboard.writeText("newClip").then(
+      () => {
+        /* clipboard successfully set */
+      },
+      () => {
+        /* clipboard write failed */
+      }
+    );
+  }, []);
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
