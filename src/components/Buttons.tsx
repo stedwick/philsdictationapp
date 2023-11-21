@@ -28,6 +28,11 @@ function copy(textareaRef: React.RefObject<HTMLTextAreaElement>) {
   }
 }
 
+function cut(textareaRef: React.RefObject<HTMLTextAreaElement>) {
+  copy(textareaRef);
+  textareaRef.current!.value = "";
+}
+
 export const Buttons: React.FC<{
   dictationState: string;
   setDictationState: Function;
@@ -101,7 +106,7 @@ export const Buttons: React.FC<{
         >
           <ClipboardIcon className="h-6 w-6"></ClipboardIcon>Copy
         </button>
-        <button className="btn btn-outline">
+        <button className="btn btn-outline" onClick={() => cut(textareaRef)}>
           <ScissorsIcon className="h-6 w-6"></ScissorsIcon>Cut
         </button>
       </div>
