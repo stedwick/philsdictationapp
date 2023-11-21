@@ -9,6 +9,14 @@ import {
   StopIcon,
 } from "@heroicons/react/24/solid";
 import toast from "react-hot-toast";
+import { invoke } from "@tauri-apps/api/tauri";
+
+async function greet(textareaRef: React.RefObject<HTMLTextAreaElement>) {
+  // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+  const text = textareaRef.current?.value;
+  const response: string = await invoke("greet", { name: text });
+  toast.success(response);
+}
 
 function copy(textareaRef: React.RefObject<HTMLTextAreaElement>) {
   const text = textareaRef.current?.value;
@@ -96,7 +104,10 @@ export const Buttons: React.FC<{
       </div>
       <div className="divider my-2 lg:hidden"></div>
       <div className="flex flex-wrap gap-2 justify-center">
-        <button className="btn btn-outline btn-secondary">
+        <button
+          className="btn btn-outline btn-secondary"
+          onClick={() => greet(textareaRef)}
+        >
           <ClipboardDocumentListIcon className="h-6 w-6"></ClipboardDocumentListIcon>
           Paste to app
         </button>
