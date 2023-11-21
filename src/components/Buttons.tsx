@@ -1,4 +1,5 @@
 import {
+  BellSnoozeIcon,
   ClipboardDocumentListIcon,
   ClipboardIcon,
   MicrophoneIcon,
@@ -19,7 +20,7 @@ export const Buttons: React.FC<{
   return (
     <div className="flex flex-wrap justify-between gap-2 mb-2">
       <div className="flex flex-wrap gap-2 mb-4">
-        {dictationState != "on" && (
+        {dictationState != "on" && !!resumeEnabled && (
           <button
             className="btn btn-outline btn-error"
             onClick={() => setDictationState("on")}
@@ -35,6 +36,14 @@ export const Buttons: React.FC<{
             <MicrophoneIcon className="h-6 w-6 animate-ping absolute left-4"></MicrophoneIcon>
             <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>
             Dictating...
+          </button>
+        )}
+        {!resumeEnabled && (
+          <button
+            className="btn btn-outline"
+            onClick={() => setDictationState("on")}
+          >
+            <BellSnoozeIcon className="h-6 w-6"></BellSnoozeIcon>Say "Wake up"
           </button>
         )}
         {!!resumeEnabled && (
