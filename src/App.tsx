@@ -2,22 +2,16 @@ import { useState } from "react";
 // import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
-import {
-  ClipboardDocumentListIcon,
-  ClipboardIcon,
-  MicrophoneIcon,
-  PauseIcon,
-  ScissorsIcon,
-  StopIcon,
-} from "@heroicons/react/24/solid";
+import { Buttons } from "./components/Buttons";
 
 function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+  const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
+    "off"
+  );
 
   async function greet() {
     // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-    setGreetMsg(await invoke("greet", { name }));
+    // setGreetMsg(await invoke("greet", { name }));
   }
 
   return (
@@ -29,36 +23,12 @@ function App() {
         className="textarea textarea-primary textarea-lg w-full my-4"
       ></textarea>
 
-      <div className="flex flex-wrap justify-between gap-2 mb-2">
-        <div className="flex flex-wrap gap-2 mb-4">
-          <button className="btn btn-outline btn-error">
-            <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>Start Dictating
-          </button>
-          <button className="btn btn-error relative hidden">
-            <MicrophoneIcon className="h-6 w-6 animate-ping absolute left-4"></MicrophoneIcon>
-            <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>
-            Dictating...
-          </button>
-          <button className="btn btn-outline btn-warning">
-            <PauseIcon className="h-6 w-6"></PauseIcon>Pause
-          </button>
-          <button className="btn btn-outline btn-info">
-            <StopIcon className="h-6 w-6"></StopIcon>Stop
-          </button>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          <button className="btn btn-outline btn-secondary">
-            <ClipboardDocumentListIcon className="h-6 w-6"></ClipboardDocumentListIcon>
-            Paste to app
-          </button>
-          <button className="btn btn-outline btn-primary">
-            <ClipboardIcon className="h-6 w-6"></ClipboardIcon>Copy
-          </button>
-          <button className="btn btn-outline">
-            <ScissorsIcon className="h-6 w-6"></ScissorsIcon>Cut
-          </button>
-        </div>
-      </div>
+      {
+        <Buttons
+          dictationState={dictationState}
+          setDictationState={setDictationState}
+        />
+      }
     </div>
   );
 }
@@ -71,17 +41,17 @@ function none() {
         className="row"
         onSubmit={(e) => {
           e.preventDefault();
-          greet();
+          // greet();
         }}
       >
         <input
           id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
+          // onChange={(e) => setName(e.currentTarget.value)}
           placeholder="Enter a name..."
         />
         <button type="submit">Greet</button>
       </form>
-      <p>{greetMsg}</p>
+      {/* <p>{greetMsg}</p> */}
     </>
   );
 }
