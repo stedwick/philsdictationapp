@@ -18,8 +18,8 @@ export const Buttons: React.FC<{
     dictationState == "on" || dictationState == "paused" ? "" : "btn-disabled";
   const resumeEnabled = dictationState == "paused" ? "" : "hidden";
   return (
-    <div className="flex flex-wrap justify-between gap-2 mb-2">
-      <div className="flex flex-wrap gap-2 mb-4">
+    <div className="flex flex-wrap justify-center lg:justify-between gap-x-12 mb-2">
+      <div className="flex flex-wrap justify-center gap-2 mb-4">
         {dictationState != "on" && !!resumeEnabled && (
           <button
             className="btn btn-outline btn-error"
@@ -69,7 +69,7 @@ export const Buttons: React.FC<{
           <StopIcon className="h-6 w-6"></StopIcon>Stop
         </button>
       </div>
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 justify-center">
         <button className="btn btn-outline btn-secondary">
           <ClipboardDocumentListIcon className="h-6 w-6"></ClipboardDocumentListIcon>
           Paste to app
