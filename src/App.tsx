@@ -30,7 +30,7 @@ function App() {
       ></textarea>
 
       <div className="flex flex-wrap justify-between gap-2 mb-2">
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-2 mb-4">
           <button className="btn btn-outline btn-error">
             <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>Start Dictating
           </button>
