@@ -8,6 +8,11 @@ import {
   ScissorsIcon,
   StopIcon,
 } from "@heroicons/react/24/solid";
+import toast from "react-hot-toast";
+
+function copy(text: string) {
+  toast.success("Copied");
+}
 
 export const Buttons: React.FC<{
   dictationState: string;
@@ -75,7 +80,10 @@ export const Buttons: React.FC<{
           <ClipboardDocumentListIcon className="h-6 w-6"></ClipboardDocumentListIcon>
           Paste to app
         </button>
-        <button className="btn btn-outline btn-primary">
+        <button
+          className="btn btn-outline btn-primary"
+          onClick={() => copy("beem!")}
+        >
           <ClipboardIcon className="h-6 w-6"></ClipboardIcon>Copy
         </button>
         <button className="btn btn-outline">

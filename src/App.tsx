@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
 import { Buttons } from "./components/Buttons";
-import { startWindToast } from "@mariojgt/wind-notify/packages/index.js";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
@@ -11,7 +11,6 @@ function App() {
   );
 
   useEffect(() => {
-    startWindToast("title", "message", "success", 2, "top");
     navigator.clipboard.writeText("newClip").then(
       () => {
         /* clipboard successfully set */
@@ -28,24 +27,29 @@ function App() {
   }
 
   return (
-    <div
-      className="container mx-auto px-4 py-4 flex flex-col"
-      style={{ height: "100dvh" }}
-    >
-      <h1 className="text-xl text-center">Welcome to Phil's Dictation App!</h1>
+    <>
+      <Toaster />
+      <div
+        className="container mx-auto px-4 py-4 flex flex-col"
+        style={{ height: "100dvh" }}
+      >
+        <h1 className="text-xl text-center">
+          Welcome to Phil's Dictation App!
+        </h1>
 
-      <textarea
-        placeholder="Click 🎙️ Start Dictating button below..."
-        className="textarea textarea-primary textarea-lg w-full my-4 flex-grow"
-      ></textarea>
+        <textarea
+          placeholder="Click 🎙️ Start Dictating button below..."
+          className="textarea textarea-primary textarea-lg w-full my-4 flex-grow"
+        ></textarea>
 
-      {
-        <Buttons
-          dictationState={dictationState}
-          setDictationState={setDictationState}
-        />
-      }
-    </div>
+        {
+          <Buttons
+            dictationState={dictationState}
+            setDictationState={setDictationState}
+          />
+        }
+      </div>
+    </>
   );
 }
 
