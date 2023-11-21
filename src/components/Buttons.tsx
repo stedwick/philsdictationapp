@@ -11,10 +11,10 @@ import {
 import toast from "react-hot-toast";
 import { invoke } from "@tauri-apps/api/tauri";
 
-async function greet(textareaRef: React.RefObject<HTMLTextAreaElement>) {
+async function pasteToApp(textareaRef: React.RefObject<HTMLTextAreaElement>) {
   // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
   const text = textareaRef.current?.value;
-  const response: string = await invoke("greet", { name: text });
+  const response: string = await invoke("pasteToApp", { text });
   toast.success(response);
 }
 
@@ -106,7 +106,7 @@ export const Buttons: React.FC<{
       <div className="flex flex-wrap gap-2 justify-center">
         <button
           className="btn btn-outline btn-secondary"
-          onClick={() => greet(textareaRef)}
+          onClick={() => pasteToApp(textareaRef)}
         >
           <ClipboardDocumentListIcon className="h-6 w-6"></ClipboardDocumentListIcon>
           Paste to app
