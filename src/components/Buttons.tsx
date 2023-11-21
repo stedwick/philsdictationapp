@@ -10,14 +10,29 @@ import {
 } from "@heroicons/react/24/solid";
 import toast from "react-hot-toast";
 
-function copy(text: string) {
-  toast.success("Copied");
+function copy(textareaRef: React.RefObject<HTMLTextAreaElement>) {
+  const text = textareaRef.current?.value;
+  if (text) {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        /* clipboard successfully set */
+        toast.success("Copied");
+      },
+      () => {
+        /* clipboard write failed */
+        toast.error("Couldn't access clipboard");
+      }
+    );
+  } else {
+    toast("Nothing to copy", { icon: "✏️" });
+  }
 }
 
 export const Buttons: React.FC<{
   dictationState: string;
   setDictationState: Function;
-}> = ({ dictationState, setDictationState }) => {
+  textareaRef: React.RefObject<HTMLTextAreaElement>;
+}> = ({ dictationState, setDictationState, textareaRef }) => {
   const pauseEnabled = dictationState == "on" ? "" : "btn-disabled";
   const stopEnabled =
     dictationState == "on" || dictationState == "paused" ? "" : "btn-disabled";
@@ -82,7 +97,7 @@ export const Buttons: React.FC<{
         </button>
         <button
           className="btn btn-outline btn-primary"
-          onClick={() => copy("beem!")}
+          onClick={() => copy(textareaRef)}
         >
           <ClipboardIcon className="h-6 w-6"></ClipboardIcon>Copy
         </button>

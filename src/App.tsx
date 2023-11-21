@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 // import reactLogo from "./assets/react.svg";
 import { invoke } from "@tauri-apps/api/tauri";
 import "./App.css";
@@ -9,6 +9,7 @@ function App() {
   const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
     "off"
   );
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     navigator.clipboard.writeText("newClip").then(
@@ -40,12 +41,14 @@ function App() {
         <textarea
           placeholder="Click 🎙️ Start Dictating button below..."
           className="textarea textarea-primary textarea-lg w-full my-4 flex-grow"
+          ref={textareaRef}
         ></textarea>
 
         {
           <Buttons
             dictationState={dictationState}
             setDictationState={setDictationState}
+            textareaRef={textareaRef}
           />
         }
       </div>
