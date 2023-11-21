@@ -15,12 +15,15 @@ function App() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-4">
+    <div
+      className="container mx-auto px-4 py-4 flex flex-col"
+      style={{ height: "100dvh" }}
+    >
       <h1 className="text-xl text-center">Welcome to Phil's Dictation App!</h1>
 
       <textarea
         placeholder="Click 🎙️ Start Dictating button below..."
-        className="textarea textarea-primary textarea-lg w-full my-4"
+        className="textarea textarea-primary textarea-lg w-full my-4 flex-grow"
       ></textarea>
 
       {
