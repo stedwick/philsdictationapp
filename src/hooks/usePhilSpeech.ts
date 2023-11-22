@@ -40,10 +40,10 @@ export function usePhilSpeech(
 
   useEffect(() => {
     if (dictationState == "on") {
-      textareaRef.current!.value += transcript;
+      textareaRef.current!.value += finalTranscript;
     }
-    resetTranscript();
-  }, [transcript]);
+    // resetTranscript();
+  }, [finalTranscript]);
 
   return {
     transcript,
