@@ -11,11 +11,22 @@ import {
 import toast from "react-hot-toast";
 import { invoke } from "@tauri-apps/api/tauri";
 
-async function pasteToApp(textareaRef: React.RefObject<HTMLTextAreaElement>) {
-  // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-  const text = textareaRef.current?.value;
-  const response: string = await invoke("pasteToApp", { text });
-  toast.success(response);
+// async function pasteToAppWithText(
+//   textareaRef: React.RefObject<HTMLTextAreaElement>
+// ) {
+//   // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+//   const text = textareaRef.current?.value || "";
+//   const response: string = await invoke("pasteToAppWithText", { text });
+//   toast.success(response);
+// }
+
+async function pasteToApp() {
+  const response: boolean = await invoke("pasteToApp");
+  if (response) {
+    toast.success("Pasted");
+  } else {
+    toast.error("Couldn't paste");
+  }
 }
 
 function copy(textareaRef: React.RefObject<HTMLTextAreaElement>) {
@@ -106,7 +117,10 @@ export const Buttons: React.FC<{
       <div className="flex flex-wrap gap-2 justify-center">
         <button
           className="btn btn-outline btn-secondary"
-          onClick={() => pasteToApp(textareaRef)}
+          onClick={() => {
+            copy(textareaRef);
+            pasteToApp();
+          }}
         >
           <ClipboardDocumentListIcon className="h-6 w-6"></ClipboardDocumentListIcon>
           Paste to app

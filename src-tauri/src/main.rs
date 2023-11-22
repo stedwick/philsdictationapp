@@ -5,25 +5,32 @@ use enigo::*;
 use std::{thread, time};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
+// #[tauri::command]
+// fn pasteToAppWithText(text: &str) -> String {
+//     pasteToApp();
+//     format!("Pasted: {}", text)
+// }
 #[tauri::command]
-fn pasteToApp(text: &str) -> String {
+fn pasteToApp() -> bool {
     let mut enigo = Enigo::new();
     // Alt-Tab
     enigo.key_down(Key::Alt);
     enigo.key_click(Key::Tab);
     enigo.key_up(Key::Alt);
-    let dur = time::Duration::from_millis(1000);
+
+    let dur = time::Duration::from_millis(500);
     thread::sleep(dur);
     // Ctrl-V
     enigo.key_down(Key::Control);
     enigo.key_click(Key::Layout('v'));
     enigo.key_up(Key::Control);
-    format!("Pasted: {}", text)
+    true
 }
 
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![pasteToApp])
+        // .invoke_handler(tauri::generate_handler![pasteToAppWithText])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
