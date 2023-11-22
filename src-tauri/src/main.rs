@@ -11,7 +11,7 @@ use std::{thread, time};
 //     format!("Pasted: {}", text)
 // }
 #[tauri::command]
-fn pasteToApp() -> bool {
+fn paste_to_app() -> bool {
     let mut enigo = Enigo::new();
     // Alt-Tab
     enigo.key_down(Key::Alt);
@@ -29,7 +29,7 @@ fn pasteToApp() -> bool {
 
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![pasteToApp])
+        .invoke_handler(tauri::generate_handler![paste_to_app])
         // .invoke_handler(tauri::generate_handler![pasteToAppWithText])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

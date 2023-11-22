@@ -8,49 +8,7 @@ import {
   ScissorsIcon,
   StopIcon,
 } from "@heroicons/react/24/solid";
-import toast from "react-hot-toast";
-import { invoke } from "@tauri-apps/api/tauri";
-
-// async function pasteToAppWithText(
-//   textareaRef: React.RefObject<HTMLTextAreaElement>
-// ) {
-//   // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-//   const text = textareaRef.current?.value || "";
-//   const response: string = await invoke("pasteToAppWithText", { text });
-//   toast.success(response);
-// }
-
-async function pasteToApp() {
-  const response: boolean = await invoke("pasteToApp");
-  if (response) {
-    toast.success("Pasted");
-  } else {
-    toast.error("Couldn't paste");
-  }
-}
-
-function copy(textareaRef: React.RefObject<HTMLTextAreaElement>) {
-  const text = textareaRef.current?.value;
-  if (text) {
-    navigator.clipboard.writeText(text).then(
-      () => {
-        /* clipboard successfully set */
-        toast.success("Copied");
-      },
-      () => {
-        /* clipboard write failed */
-        toast.error("Couldn't access clipboard");
-      }
-    );
-  } else {
-    toast("Nothing to copy", { icon: "✏️" });
-  }
-}
-
-function cut(textareaRef: React.RefObject<HTMLTextAreaElement>) {
-  copy(textareaRef);
-  textareaRef.current!.value = "";
-}
+import { copy, cut, pasteToApp } from "../helpers/clipboard";
 
 export const Buttons: React.FC<{
   dictationState: string;
@@ -61,6 +19,7 @@ export const Buttons: React.FC<{
   const stopEnabled =
     dictationState == "on" || dictationState == "paused" ? "" : "btn-disabled";
   const resumeEnabled = dictationState == "paused" ? "" : "hidden";
+
   return (
     <div className="flex flex-wrap justify-center lg:justify-between flex-col lg:flex-row gap-x-12 mb-2">
       <div className="flex flex-wrap justify-center gap-2">
@@ -113,7 +72,9 @@ export const Buttons: React.FC<{
           <StopIcon className="h-6 w-6"></StopIcon>Stop
         </button>
       </div>
+
       <div className="divider my-2 lg:hidden"></div>
+
       <div className="flex flex-wrap gap-2 justify-center">
         <button
           className="btn btn-outline btn-secondary"
