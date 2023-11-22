@@ -15,12 +15,16 @@
     "@tauri-apps/api": "^1.5.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-hot-toast": "^2.4.1"
+    "react-hot-toast": "^2.4.1",
+    "react-speech-recognition": "^3.10.0",
+    "regenerator-runtime": "^0.14.0",
+    "use-navigator-online": "^3.2.4"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.5.6",
     "@types/react": "^18.2.15",
     "@types/react-dom": "^18.2.7",
+    "@types/react-speech-recognition": "^3.9.5",
     "@vitejs/plugin-react": "^4.0.3",
     "autoprefixer": "^10.4.16",
     "daisyui": "^4.4.2",
