@@ -39,8 +39,8 @@ export function usePhilSpeech(
     // browser action
     if (dictationState != "off" && !listening) {
       setDictationState("off");
-    } else if (dictationState == "off" && listening) {
-      setDictationState("on");
+      // } else if (dictationState == "off" && listening) {
+      //   setDictationState("on");
     }
   }, [listening]);
 
