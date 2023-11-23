@@ -35,7 +35,6 @@ export function copy(
         /* clipboard successfully set */
         if (opts.toast) toast.success("Copied");
         if (opts.success) opts.success();
-        textareaRef.current!.value = "";
       },
       () => {
         /* clipboard write failed */
@@ -45,9 +44,4 @@ export function copy(
   } else {
     toast("Nothing to copy", { icon: "✏️" });
   }
-}
-
-export function cut(textareaRef: React.RefObject<HTMLTextAreaElement>) {
-  copy(textareaRef);
-  textareaRef.current!.value = "";
 }
