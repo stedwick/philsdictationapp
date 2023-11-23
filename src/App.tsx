@@ -6,12 +6,8 @@ import { Toaster } from "react-hot-toast";
 import { useNetworkState } from "@uidotdev/usehooks";
 // import { usePrevious } from "@uidotdev/usehooks";
 import { usePhilSpeech } from "./hooks/usePhilSpeech";
-import {
-  ExclamationCircleIcon,
-  ExclamationTriangleIcon,
-  MicrophoneIcon,
-} from "@heroicons/react/24/solid";
-import { Wifi, WifiOff } from "lucide-react";
+import Indicators from "./components/Indicators";
+import MicErrors from "./components/MicErrors";
 
 function App() {
   const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
@@ -54,56 +50,14 @@ function App() {
             ref={textareaRef}
           ></textarea>
           <div className="absolute bottom-2 left-0 right-0 flex justify-end space-x-2 px-2">
-            {!listening && (
-              <div className="tooltip" data-tip="Mic off">
-                <span className="badge badge-outline badge-neutral">
-                  <MicrophoneIcon className="h-4 w-4"></MicrophoneIcon>
-                </span>
-              </div>
-            )}
-            {listening && (
-              <div className="tooltip" data-tip="Mic listening">
-                <span className="badge badge-outline badge-success">
-                  <MicrophoneIcon className="h-4 w-4"></MicrophoneIcon>
-                </span>
-              </div>
-            )}
-            {!network.online && (
-              <div className="tooltip" data-tip="Offline">
-                <span className="badge badge-outline badge-neutral">
-                  <WifiOff className="h-4 w-4" />
-                </span>
-              </div>
-            )}
-            {network.online && (
-              <div className="tooltip" data-tip="Online">
-                <span className="badge badge-outline badge-primary">
-                  <Wifi className="h-4 w-4" />
-                </span>
-              </div>
-            )}
+            <Indicators listening={listening} network={network} />
           </div>
         </div>
-        {!browserSupportsSpeechRecognition && (
-          <div
-            role="alert"
-            className="alert alert-error mb-4 flex justify-center max-w-lg mx-auto"
-          >
-            <ExclamationCircleIcon className="h-6 w-6 shrink-0"></ExclamationCircleIcon>
-            <span className="font-bold">
-              Browser doesn't support speech recognition.
-            </span>
-          </div>
-        )}
-        {!isMicrophoneAvailable && (
-          <div
-            role="alert"
-            className="alert alert-warning mb-4 flex justify-center max-w-lg mx-auto"
-          >
-            <ExclamationTriangleIcon className="h-6 w-6 shrink-0"></ExclamationTriangleIcon>
-            <span className="font-bold">Couldn't access microphone.</span>
-          </div>
-        )}
+
+        <MicErrors
+          isMicrophoneAvailable={isMicrophoneAvailable}
+          browserSupportsSpeechRecognition={browserSupportsSpeechRecognition}
+        />
 
         {
           <Buttons
