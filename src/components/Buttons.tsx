@@ -79,8 +79,7 @@ export const Buttons: React.FC<{
         <button
           className="btn btn-outline btn-secondary"
           onClick={() => {
-            copy(textareaRef);
-            pasteToApp();
+            copy(textareaRef, { toast: false, success: pasteToApp });
           }}
         >
           <ClipboardDocumentListIcon className="h-6 w-6"></ClipboardDocumentListIcon>

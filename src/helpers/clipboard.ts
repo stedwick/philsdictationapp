@@ -19,13 +19,23 @@ export async function pasteToApp() {
   }
 }
 
-export function copy(textareaRef: React.RefObject<HTMLTextAreaElement>) {
+type CopyOpts = {
+  toast?: boolean;
+  success?: Function | null;
+};
+export function copy(
+  textareaRef: React.RefObject<HTMLTextAreaElement>,
+  userOpts: CopyOpts = {}
+) {
+  const opts = { toast: true, success: null, ...userOpts };
   const text = textareaRef.current?.value;
   if (text) {
     navigator.clipboard.writeText(text).then(
       () => {
         /* clipboard successfully set */
-        toast.success("Copied");
+        if (opts.toast) toast.success("Copied");
+        if (opts.success) opts.success();
+        textareaRef.current!.value = "";
       },
       () => {
         /* clipboard write failed */
