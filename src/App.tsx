@@ -3,16 +3,17 @@ import { useState, useRef, useEffect } from "react";
 import "./App.css";
 import { Buttons } from "./components/Buttons";
 import { Toaster } from "react-hot-toast";
-import useNavigatorOnline from "use-navigator-online";
+// import { useNetworkState } from "@uidotdev/usehooks";
+// import { usePrevious } from "@uidotdev/usehooks";
 import { usePhilSpeech } from "./hooks/usePhilSpeech";
 
 function App() {
   const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
     "off"
   );
+  // const previousDictationState = usePrevious(dictationState);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const { isOnline, isOffline, backOnline, backOffline } = useNavigatorOnline();
+  // const network = useNetworkState();
 
   const {
     transcript,
@@ -40,10 +41,10 @@ function App() {
           Welcome to Phil's Dictation App!
         </h1>
 
-        <p>
+        {/* <p>
           {isOnline ? "online" : "not online"}{" "}
           {isOffline ? "offline" : "not offline"}
-        </p>
+        </p> */}
 
         <textarea
           placeholder="Click 🎙️ Start Dictating button below..."
