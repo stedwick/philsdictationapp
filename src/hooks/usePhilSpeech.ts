@@ -4,7 +4,11 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 
 export function usePhilSpeech(
+  previousDictationState: string,
   dictationState: string,
+  setDictationState: React.Dispatch<
+    React.SetStateAction<"on" | "off" | "paused">
+  >,
   textareaRef: React.RefObject<HTMLTextAreaElement>
 ) {
   const {
@@ -24,10 +28,20 @@ export function usePhilSpeech(
   // }
 
   useEffect(() => {
-    if (dictationState == "on" && !listening) {
-      SpeechRecognition.startListening({ continuous: true });
-    } else if (dictationState == "off" && listening) {
-      SpeechRecognition.stopListening();
+    if (previousDictationState != dictationState) {
+      // user action
+      if (dictationState == "on" && !listening) {
+        SpeechRecognition.startListening({ continuous: false });
+      } else if (dictationState == "off" && listening) {
+        SpeechRecognition.stopListening();
+      }
+    } else if (previousDictationState == dictationState) {
+      // browser action
+      if (dictationState == "on" && !listening) {
+        setDictationState("off");
+      } else if (dictationState == "off" && listening) {
+        setDictationState("on");
+      }
     }
   }, [dictationState, listening]);
 
