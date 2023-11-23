@@ -4,7 +4,7 @@ import SpeechRecognition, {
 } from "react-speech-recognition";
 
 export function usePhilSpeech(
-  previousDictationState: string,
+  // previousDictationState: string,
   dictationState: string,
   setDictationState: React.Dispatch<
     React.SetStateAction<"on" | "off" | "paused">
@@ -28,22 +28,21 @@ export function usePhilSpeech(
   // }
 
   useEffect(() => {
-    if (previousDictationState != dictationState) {
-      // user action
-      if (dictationState == "on" && !listening) {
-        SpeechRecognition.startListening({ continuous: false });
-      } else if (dictationState == "off" && listening) {
-        SpeechRecognition.stopListening();
-      }
-    } else if (previousDictationState == dictationState) {
-      // browser action
-      if (dictationState == "on" && !listening) {
-        setDictationState("off");
-      } else if (dictationState == "off" && listening) {
-        setDictationState("on");
-      }
+    // user action
+    if (dictationState != "off" && !listening) {
+      SpeechRecognition.startListening({ continuous: true });
+    } else if (dictationState == "off" && listening) {
+      SpeechRecognition.stopListening();
     }
-  }, [dictationState, listening]);
+  }, [dictationState]);
+  useEffect(() => {
+    // browser action
+    if (dictationState != "off" && !listening) {
+      setDictationState("off");
+    } else if (dictationState == "off" && listening) {
+      setDictationState("on");
+    }
+  }, [listening]);
 
   useEffect(() => {
     if (dictationState == "on") {

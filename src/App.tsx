@@ -4,7 +4,7 @@ import "./App.css";
 import { Buttons } from "./components/Buttons";
 import { Toaster } from "react-hot-toast";
 import { useNetworkState } from "@uidotdev/usehooks";
-import { usePrevious } from "@uidotdev/usehooks";
+// import { usePrevious } from "@uidotdev/usehooks";
 import { usePhilSpeech } from "./hooks/usePhilSpeech";
 import Indicators from "./components/Indicators";
 import MicErrors from "./components/MicErrors";
@@ -13,7 +13,7 @@ function App() {
   const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
     "off"
   );
-  const previousDictationState = usePrevious(dictationState);
+  // const previousDictationState = usePrevious(dictationState);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const network = useNetworkState();
 
@@ -21,13 +21,13 @@ function App() {
     transcript,
     interimTranscript,
     finalTranscript,
-    resetTranscript,
+    // resetTranscript,
     listening,
     browserSupportsSpeechRecognition,
     // browserSupportsContinuousListening,
     isMicrophoneAvailable,
   } = usePhilSpeech(
-    previousDictationState,
+    // previousDictationState,
     dictationState,
     setDictationState,
     textareaRef
