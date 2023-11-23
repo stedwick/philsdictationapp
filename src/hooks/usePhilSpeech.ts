@@ -17,13 +17,6 @@ export function usePhilSpeech(
     // browserSupportsContinuousListening,
     isMicrophoneAvailable,
   } = useSpeechRecognition();
-  if (!browserSupportsSpeechRecognition) {
-    // return <span>Browser doesn't support speech recognition.</span>;
-  }
-  if (!isMicrophoneAvailable) {
-    // Render some fallback conten
-    // return <span>Couldn't access microphone.</span>;
-  }
   // if (browserSupportsContinuousListening) {
   //   // SpeechRecognition.startListening({ continuous: true });
   // } else {
@@ -32,7 +25,7 @@ export function usePhilSpeech(
 
   useEffect(() => {
     if (dictationState == "on" && !listening) {
-      SpeechRecognition.startListening();
+      SpeechRecognition.startListening({ continuous: true });
     } else if (dictationState == "off" && listening) {
       SpeechRecognition.stopListening();
     }
