@@ -8,6 +8,7 @@ import { useNetworkState } from "@uidotdev/usehooks";
 import { usePhilSpeech } from "./hooks/usePhilSpeech";
 import Indicators from "./components/Indicators";
 import MicErrors from "./components/MicErrors";
+import { TextareaUtils } from "./helpers/TextareaUtils";
 
 function App() {
   const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
@@ -35,6 +36,7 @@ function App() {
 
   useEffect(() => {
     console.log({ transcript, interimTranscript, finalTranscript });
+    window.textareaUtils = new TextareaUtils(textareaRef);
   }, [transcript, interimTranscript, finalTranscript]);
 
   return (
