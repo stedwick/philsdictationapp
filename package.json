@@ -20,6 +20,7 @@
     "react-hot-toast": "^2.4.1",
     "react-speech-recognition": "^3.10.0",
     "regenerator-runtime": "^0.14.0",
+    "textarea-caret": "github:component/textarea-caret-position",
     "use-navigator-online": "^3.2.4"
   },
   "devDependencies": {
