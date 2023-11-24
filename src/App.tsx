@@ -8,8 +8,6 @@ import { useNetworkState } from "@uidotdev/usehooks";
 import { usePhilSpeech } from "./hooks/usePhilSpeech";
 import Indicators from "./components/Indicators";
 import MicErrors from "./components/MicErrors";
-// @ts-ignore
-import { getCaretCoordinates } from "./helpers/textarea-caret-position";
 
 function App() {
   const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
@@ -18,8 +16,6 @@ function App() {
   // const previousDictationState = usePrevious(dictationState);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const network = useNetworkState();
-  const [carrotTop, setCarrotTop] = useState(0);
-  const [carrotLeft, setCarrotLeft] = useState(0);
 
   const {
     transcript,
@@ -41,20 +37,6 @@ function App() {
     console.log({ transcript, interimTranscript, finalTranscript });
   }, [transcript, interimTranscript, finalTranscript]);
 
-  useEffect(() => {
-    document.querySelector("textarea")?.addEventListener("click", function () {
-      var caret = getCaretCoordinates(this, this.selectionEnd);
-      console.log(
-        "(top, left, height) = (%s, %s, %s)",
-        caret.top,
-        caret.left,
-        caret.height
-      );
-      setCarrotTop(caret.top);
-      setCarrotLeft(caret.left);
-    });
-  }, []);
-
   return (
     <>
       <Toaster />
@@ -75,13 +57,6 @@ function App() {
           <div className="absolute bottom-2 left-0 right-0 flex justify-end space-x-2 px-2">
             <Indicators listening={listening} network={network} />
           </div>
-          <span
-            className="absolute inline-block left-0 right-0 mx-6 px-2 py-1 border rounded-lg bg-neutral"
-            style={{ textIndent: carrotLeft - 24, top: carrotTop + 24 }}
-          >
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          </span>
         </div>
 
         <MicErrors
