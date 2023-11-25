@@ -1,10 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useDeferredValue } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
+import { TextareaUtils } from "../helpers/TextareaUtils";
 
 export function usePhilSpeech(
-  // previousDictationState: string,
   dictationState: string,
   setDictationState: React.Dispatch<
     React.SetStateAction<"on" | "off" | "paused">
@@ -21,12 +21,13 @@ export function usePhilSpeech(
     // browserSupportsContinuousListening,
     isMicrophoneAvailable,
   } = useSpeechRecognition();
-  // if (browserSupportsContinuousListening) {
-  //   // SpeechRecognition.startListening({ continuous: true });
-  // } else {
-  //   // Fallback behaviour
-  // }
+  const textareaUtils = useMemo(
+    () => new TextareaUtils(textareaRef),
+    [textareaRef]
+  );
+  const deferredInterimTranscript = useDeferredValue(interimTranscript);
 
+  // Controls the mic
   useEffect(() => {
     // user action
     if (dictationState != "off" && !listening) {
@@ -39,16 +40,26 @@ export function usePhilSpeech(
     // browser action
     if (dictationState != "off" && !listening) {
       setDictationState("off");
-      // } else if (dictationState == "off" && listening) {
-      //   setDictationState("on");
+    } else if (dictationState == "off" && listening) {
+      setDictationState("paused");
     }
   }, [listening]);
 
+  // Where the magic happens
   useEffect(() => {
+    if (!deferredInterimTranscript) return;
     if (dictationState == "on") {
-      textareaRef.current!.value += finalTranscript;
+      textareaUtils.insertAtCursor(deferredInterimTranscript, {
+        selectInsertedText: true,
+      });
     }
-    // resetTranscript();
+  }, [deferredInterimTranscript]);
+  useEffect(() => {
+    if (!finalTranscript) return;
+    if (dictationState == "on") {
+      textareaUtils.insertAtCursor(finalTranscript);
+      resetTranscript();
+    }
   }, [finalTranscript]);
 
   return {

@@ -1,43 +1,29 @@
-import { useState, useRef, useEffect } from "react";
-// import reactLogo from "./assets/react.svg";
+import { useState, useRef } from "react";
 import "./App.css";
 import { Buttons } from "./components/Buttons";
 import { Toaster } from "react-hot-toast";
 import { useNetworkState } from "@uidotdev/usehooks";
-// import { usePrevious } from "@uidotdev/usehooks";
 import { usePhilSpeech } from "./hooks/usePhilSpeech";
 import Indicators from "./components/Indicators";
 import MicErrors from "./components/MicErrors";
-import { TextareaUtils } from "./helpers/TextareaUtils";
 
 function App() {
   const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
     "off"
   );
-  // const previousDictationState = usePrevious(dictationState);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const network = useNetworkState();
 
   const {
-    transcript,
-    interimTranscript,
-    finalTranscript,
+    // transcript,
+    // interimTranscript,
+    // finalTranscript,
     // resetTranscript,
     listening,
     browserSupportsSpeechRecognition,
     // browserSupportsContinuousListening,
     isMicrophoneAvailable,
-  } = usePhilSpeech(
-    // previousDictationState,
-    dictationState,
-    setDictationState,
-    textareaRef
-  );
-
-  useEffect(() => {
-    console.log({ transcript, interimTranscript, finalTranscript });
-    window.textareaUtils = new TextareaUtils(textareaRef);
-  }, [transcript, interimTranscript, finalTranscript]);
+  } = usePhilSpeech(dictationState, setDictationState, textareaRef);
 
   return (
     <>
