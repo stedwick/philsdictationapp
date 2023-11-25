@@ -43,8 +43,6 @@ export class TextareaUtils {
     const opts = { selectInsertedText: false, ...userOpts };
     if (text.length == 0) return;
 
-    this.textarea.focus();
-
     if (this.spaceIsNeededBefore()) {
       text = " " + text;
     }
@@ -59,10 +57,11 @@ export class TextareaUtils {
     this.textarea.value = beforeCursor + text + afterCursor;
 
     const cursorPosition = beforeCursor.length + text.length;
+    this.textarea.blur(); // to scroll to cursor position
+    this.textarea.setSelectionRange(cursorPosition, cursorPosition);
+    this.textarea.focus();
     if (opts.selectInsertedText) {
       this.textarea.setSelectionRange(beforeCursor.length, cursorPosition);
-    } else {
-      this.textarea.setSelectionRange(cursorPosition, cursorPosition);
     }
   }
 }

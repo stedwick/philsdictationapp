@@ -30,12 +30,12 @@ export function usePhilSpeech(
   // Controls the mic
   useEffect(() => {
     // user action
-    resetTranscript();
     if (dictationState != "off" && !listening) {
       SpeechRecognition.startListening({ continuous: true });
     } else if (dictationState == "off" && listening) {
       SpeechRecognition.stopListening();
     }
+    if (dictationState == "on") resetTranscript();
   }, [dictationState]);
   useEffect(() => {
     // browser action
