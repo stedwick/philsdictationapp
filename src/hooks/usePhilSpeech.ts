@@ -3,6 +3,7 @@ import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
 import { TextareaUtils } from "../helpers/TextareaUtils";
+import { generateCommands } from "../helpers/commands";
 
 export function usePhilSpeech(
   dictationState: string,
@@ -11,6 +12,14 @@ export function usePhilSpeech(
   >,
   textareaRef: React.RefObject<HTMLTextAreaElement>
 ) {
+  const textareaUtils = useMemo(
+    () => new TextareaUtils(textareaRef),
+    [textareaRef]
+  );
+  const commands = useMemo(
+    () => generateCommands({ textareaRef, textareaUtils, setDictationState }),
+    [textareaRef, textareaUtils, setDictationState]
+  );
   const {
     transcript,
     interimTranscript,
@@ -20,11 +29,7 @@ export function usePhilSpeech(
     browserSupportsSpeechRecognition,
     // browserSupportsContinuousListening,
     isMicrophoneAvailable,
-  } = useSpeechRecognition();
-  const textareaUtils = useMemo(
-    () => new TextareaUtils(textareaRef),
-    [textareaRef]
-  );
+  } = useSpeechRecognition({ commands });
   const deferredInterimTranscript = useDeferredValue(interimTranscript);
   const lastSpokenAtRef = useRef(Date.now());
 
