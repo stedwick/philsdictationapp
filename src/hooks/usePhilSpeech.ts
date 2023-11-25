@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useDeferredValue } from "react";
+import { useEffect, useMemo, useDeferredValue, useRef } from "react";
 import SpeechRecognition, {
   useSpeechRecognition,
 } from "react-speech-recognition";
@@ -26,10 +26,29 @@ export function usePhilSpeech(
     [textareaRef]
   );
   const deferredInterimTranscript = useDeferredValue(interimTranscript);
+  const lastSpokenAtRef = useRef(Date.now());
+
+  // setInterval for sleep/off
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const timeDiff = Date.now() - lastSpokenAtRef.current;
+      if (timeDiff > 30 * 1000) {
+        setDictationState((dictationState) =>
+          dictationState != "off" ? "paused" : dictationState
+        );
+      }
+      if (timeDiff > 5 * 60 * 1000) {
+        setDictationState("off");
+      }
+    }, 10 * 1000);
+
+    return () => clearInterval(intervalId); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+  }, []);
 
   // Controls the mic
   useEffect(() => {
     // user action
+    lastSpokenAtRef.current = Date.now();
     if (dictationState != "off" && !listening) {
       SpeechRecognition.startListening({ continuous: true });
     } else if (dictationState == "off" && listening) {
@@ -50,6 +69,7 @@ export function usePhilSpeech(
   useEffect(() => {
     if (!deferredInterimTranscript) return;
     if (dictationState == "on") {
+      lastSpokenAtRef.current = Date.now();
       textareaUtils.insertAtCursor(deferredInterimTranscript, {
         selectInsertedText: true,
       });
