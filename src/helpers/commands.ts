@@ -22,9 +22,9 @@ export function generateCommands(opts: GenerateCommandsOpts) {
     {
       command: ["resume(.)", "wake up(.)"],
       callback: () => {
-        setDictationState("on");
         setTimeout(() => {
-          textareaUtils.undoPreviousInsert();
+          setDictationState("on");
+          // textareaUtils.undoPreviousInsert();
         }, 500);
       },
     },
