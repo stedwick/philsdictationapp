@@ -121,4 +121,15 @@ export class TextareaUtils {
     this.snapshotCurrent();
     this.snapshotPrevious();
   }
+
+  goHome() {
+    this.textarea.setSelectionRange(0, 0);
+    this.currentSelectionStart = this.textarea.selectionStart;
+    this.currentSelectionEnd = this.textarea.selectionEnd;
+  }
+  goEnd() {
+    this.textarea.selectionStart = this.textarea.value.length;
+    this.currentSelectionStart = this.textarea.selectionStart;
+    this.currentSelectionEnd = this.textarea.selectionEnd;
+  }
 }

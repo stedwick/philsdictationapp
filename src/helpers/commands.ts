@@ -47,5 +47,29 @@ export function generateCommands(opts: GenerateCommandsOpts) {
         }, 500);
       },
     },
+    {
+      command: ["(go to) beginning(.)", "(go) home(.)"],
+      callback: () => {
+        if (dictationStateRef.current != "on") return;
+        setDictationState("paused");
+        textareaUtils.undoCurrentInsert();
+        textareaUtils.goHome();
+        setTimeout(() => {
+          setDictationState("on");
+        }, 500);
+      },
+    },
+    {
+      command: ["(go to) end(.)"],
+      callback: () => {
+        if (dictationStateRef.current != "on") return;
+        setDictationState("paused");
+        textareaUtils.undoCurrentInsert();
+        textareaUtils.goEnd();
+        setTimeout(() => {
+          setDictationState("on");
+        }, 500);
+      },
+    },
   ];
 }
