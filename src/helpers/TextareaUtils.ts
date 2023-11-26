@@ -5,7 +5,13 @@ type InsertOpts = {
 
 export class TextareaUtils {
   readonly textareaRef: React.RefObject<HTMLTextAreaElement>;
-  lastInsertedText = "";
+  // without interimTranscript
+  currentInsertedText = "";
+  currentValue = "";
+  currentSelectionStart = 0;
+  currentSelectionEnd = 0;
+  // after finalTranscript
+  previousInsertedText = "";
   previousValue = "";
   previousSelectionStart = 0;
   previousSelectionEnd = 0;
@@ -61,6 +67,14 @@ export class TextareaUtils {
     text = text.replace(/^\s+/, " ");
     text = text.replace(/\s+$/, " ");
 
+    // previous values; interim doesn't count
+    if (!opts.selectInsertedText) {
+      this.previousInsertedText = text;
+      this.previousValue = this.textarea.value;
+      this.previousSelectionStart = this.textarea.selectionStart;
+      this.previousSelectionEnd = this.textarea.selectionEnd;
+    }
+
     const [beforeCursor, afterCursor] =
       this.valuesBeforeAndAfterCursorSelection();
     this.textarea.value = beforeCursor + text + afterCursor;
@@ -73,16 +87,24 @@ export class TextareaUtils {
       this.textarea.setSelectionRange(beforeCursor.length, cursorPosition);
     }
 
-    // interim doesn't count
+    // current values; interim doesn't count
     if (!opts.selectInsertedText) {
-      this.lastInsertedText = text;
-      this.previousValue = this.textarea.value;
-      this.previousSelectionStart = this.textarea.selectionStart;
-      this.previousSelectionEnd = this.textarea.selectionEnd;
+      this.currentInsertedText = text;
+      this.currentValue = this.textarea.value;
+      this.currentSelectionStart = this.textarea.selectionStart;
+      this.currentSelectionEnd = this.textarea.selectionEnd;
     }
   }
 
-  undoLastInsert() {
+  undoCurrentInsert() {
+    this.textarea.value = this.currentValue;
+    this.textarea.setSelectionRange(
+      this.currentSelectionStart,
+      this.currentSelectionEnd
+    );
+  }
+
+  undoPreviousInsert() {
     this.textarea.value = this.previousValue;
     this.textarea.setSelectionRange(
       this.previousSelectionStart,

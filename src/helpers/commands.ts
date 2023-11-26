@@ -13,21 +13,26 @@ export function generateCommands(opts: GenerateCommandsOpts) {
   return [
     {
       command: ["pause(.)", "(go to) sleep(.)"],
-      callback: (obj: { command: string; resetTranscript: Function }) => {
+      // callback: (obj: { command: string; resetTranscript: Function }) => {
+      callback: () => {
         setDictationState("paused");
-        textareaUtils.undoLastInsert();
+        textareaUtils.undoCurrentInsert();
       },
     },
     {
       command: ["resume(.)", "wake up(.)"],
       callback: () => {
         setDictationState("on");
+        setTimeout(() => {
+          textareaUtils.undoPreviousInsert();
+        }, 500);
       },
     },
     {
       command: ["stop(.)", "(turn) (mic) (Mike) (microphone) off(.)"],
       callback: () => {
         setDictationState("off");
+        textareaUtils.undoCurrentInsert();
       },
     },
   ];
