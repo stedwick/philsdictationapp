@@ -95,7 +95,6 @@ export class TextareaUtils {
     this.currentValue = this.textarea.value;
     this.currentSelectionStart = this.textarea.selectionStart;
     this.currentSelectionEnd = this.textarea.selectionEnd;
-    console.log("currentValue", this.currentValue);
   }
 
   snapshotPrevious() {
@@ -103,7 +102,6 @@ export class TextareaUtils {
     this.previousValue = this.currentValue;
     this.previousSelectionStart = this.currentSelectionStart;
     this.previousSelectionEnd = this.currentSelectionEnd;
-    console.log("previousValue", this.previousValue);
   }
 
   undoCurrentInsert() {
