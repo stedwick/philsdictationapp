@@ -59,7 +59,6 @@ export function usePhilSpeech(
     } else if (dictationState == "off" && listening) {
       SpeechRecognition.stopListening();
     }
-    if (dictationState == "on") resetTranscript();
   }, [dictationState]);
   useEffect(() => {
     // browser action
@@ -84,8 +83,8 @@ export function usePhilSpeech(
     if (!finalTranscript) return;
     if (dictationState == "on") {
       textareaUtils.insertAtCursor(finalTranscript);
-      resetTranscript();
     }
+    resetTranscript();
   }, [finalTranscript]);
 
   return {

@@ -1,9 +1,14 @@
 type InsertOpts = {
   selectInsertedText?: boolean;
+  allowEmptyString?: boolean;
 };
 
 export class TextareaUtils {
   readonly textareaRef: React.RefObject<HTMLTextAreaElement>;
+  lastInsertedText = "";
+  previousValue = "";
+  previousSelectionStart = 0;
+  previousSelectionEnd = 0;
 
   constructor(textareaRef: React.RefObject<HTMLTextAreaElement>) {
     this.textareaRef = textareaRef;
@@ -40,8 +45,12 @@ export class TextareaUtils {
   }
 
   insertAtCursor(text: string, userOpts: InsertOpts = {}) {
-    const opts = { selectInsertedText: false, ...userOpts };
-    if (text.length == 0) return;
+    const opts = {
+      selectInsertedText: false,
+      allowEmptyString: false,
+      ...userOpts,
+    };
+    if (text.length == 0 && !opts.allowEmptyString) return;
 
     if (this.spaceIsNeededBefore()) {
       text = " " + text;
@@ -63,5 +72,21 @@ export class TextareaUtils {
     if (opts.selectInsertedText) {
       this.textarea.setSelectionRange(beforeCursor.length, cursorPosition);
     }
+
+    // interim doesn't count
+    if (!opts.selectInsertedText) {
+      this.lastInsertedText = text;
+      this.previousValue = this.textarea.value;
+      this.previousSelectionStart = this.textarea.selectionStart;
+      this.previousSelectionEnd = this.textarea.selectionEnd;
+    }
+  }
+
+  undoLastInsert() {
+    this.textarea.value = this.previousValue;
+    this.textarea.setSelectionRange(
+      this.previousSelectionStart,
+      this.previousSelectionEnd
+    );
   }
 }
