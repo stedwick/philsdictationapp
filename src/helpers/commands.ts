@@ -8,6 +8,7 @@ interface GenerateCommandsOpts {
   >;
 }
 
+// TODO: Need a better way to store history and process commands without typing.
 export function generateCommands(opts: GenerateCommandsOpts) {
   const { textareaRef, textareaUtils, setDictationState } = opts;
   return [
@@ -33,6 +34,16 @@ export function generateCommands(opts: GenerateCommandsOpts) {
       callback: () => {
         setDictationState("off");
         textareaUtils.undoCurrentInsert();
+      },
+    },
+    {
+      command: ["undo (that)(.)", "scratch (that)(.)"],
+      callback: () => {
+        setDictationState("paused");
+        textareaUtils.undoPreviousInsert();
+        setTimeout(() => {
+          setDictationState("on");
+        }, 500);
       },
     },
   ];

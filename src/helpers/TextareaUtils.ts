@@ -69,10 +69,11 @@ export class TextareaUtils {
 
     // previous values; interim doesn't count
     if (!opts.selectInsertedText) {
-      this.previousInsertedText = text;
-      this.previousValue = this.textarea.value;
-      this.previousSelectionStart = this.textarea.selectionStart;
-      this.previousSelectionEnd = this.textarea.selectionEnd;
+      this.previousInsertedText = this.currentInsertedText;
+      this.previousValue = this.currentValue;
+      this.previousSelectionStart = this.currentSelectionStart;
+      this.previousSelectionEnd = this.currentSelectionEnd;
+      console.log("previousValue", this.previousValue);
     }
 
     const [beforeCursor, afterCursor] =
@@ -93,6 +94,7 @@ export class TextareaUtils {
       this.currentValue = this.textarea.value;
       this.currentSelectionStart = this.textarea.selectionStart;
       this.currentSelectionEnd = this.textarea.selectionEnd;
+      console.log("currentValue", this.currentValue);
     }
   }
 
