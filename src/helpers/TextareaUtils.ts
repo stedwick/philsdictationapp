@@ -69,11 +69,7 @@ export class TextareaUtils {
 
     // previous values; interim doesn't count
     if (!opts.selectInsertedText) {
-      this.previousInsertedText = this.currentInsertedText;
-      this.previousValue = this.currentValue;
-      this.previousSelectionStart = this.currentSelectionStart;
-      this.previousSelectionEnd = this.currentSelectionEnd;
-      console.log("previousValue", this.previousValue);
+      this.snapshotPrevious();
     }
 
     const [beforeCursor, afterCursor] =
@@ -90,12 +86,24 @@ export class TextareaUtils {
 
     // current values; interim doesn't count
     if (!opts.selectInsertedText) {
-      this.currentInsertedText = text;
-      this.currentValue = this.textarea.value;
-      this.currentSelectionStart = this.textarea.selectionStart;
-      this.currentSelectionEnd = this.textarea.selectionEnd;
-      console.log("currentValue", this.currentValue);
+      this.snapshotCurrent(text);
     }
+  }
+
+  snapshotCurrent(text: string = "") {
+    this.currentInsertedText = text;
+    this.currentValue = this.textarea.value;
+    this.currentSelectionStart = this.textarea.selectionStart;
+    this.currentSelectionEnd = this.textarea.selectionEnd;
+    console.log("currentValue", this.currentValue);
+  }
+
+  snapshotPrevious() {
+    this.previousInsertedText = this.currentInsertedText;
+    this.previousValue = this.currentValue;
+    this.previousSelectionStart = this.currentSelectionStart;
+    this.previousSelectionEnd = this.currentSelectionEnd;
+    console.log("previousValue", this.previousValue);
   }
 
   undoCurrentInsert() {
@@ -112,5 +120,7 @@ export class TextareaUtils {
       this.previousSelectionStart,
       this.previousSelectionEnd
     );
+    this.snapshotCurrent();
+    this.snapshotPrevious();
   }
 }
