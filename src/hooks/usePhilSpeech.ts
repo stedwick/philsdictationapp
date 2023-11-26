@@ -16,8 +16,18 @@ export function usePhilSpeech(
     () => new TextareaUtils(textareaRef),
     [textareaRef]
   );
+  const dictationStateRef = useRef(dictationState);
+  useEffect(() => {
+    dictationStateRef.current = dictationState;
+  }, [dictationState]);
   const commands = useMemo(
-    () => generateCommands({ textareaRef, textareaUtils, setDictationState }),
+    () =>
+      generateCommands({
+        textareaRef,
+        textareaUtils,
+        dictationStateRef,
+        setDictationState,
+      }),
     [textareaRef, textareaUtils, setDictationState]
   );
   const {
