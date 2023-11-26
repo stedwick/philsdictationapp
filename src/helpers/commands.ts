@@ -1,7 +1,6 @@
 import { TextareaUtils } from "./TextareaUtils";
 
 interface GenerateCommandsOpts {
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
   textareaUtils: TextareaUtils;
   dictationStateRef: React.MutableRefObject<string>;
   setDictationState: React.Dispatch<
@@ -11,8 +10,7 @@ interface GenerateCommandsOpts {
 
 // TODO: Need a better way to store history and process commands without typing.
 export function generateCommands(opts: GenerateCommandsOpts) {
-  const { textareaRef, textareaUtils, dictationStateRef, setDictationState } =
-    opts;
+  const { textareaUtils, dictationStateRef, setDictationState } = opts;
   return [
     {
       command: ["pause(.)", "(go to) sleep(.)"],

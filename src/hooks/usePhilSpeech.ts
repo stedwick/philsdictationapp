@@ -23,12 +23,11 @@ export function usePhilSpeech(
   const commands = useMemo(
     () =>
       generateCommands({
-        textareaRef,
         textareaUtils,
         dictationStateRef,
         setDictationState,
       }),
-    [textareaRef, textareaUtils, setDictationState]
+    [textareaUtils, dictationStateRef, setDictationState]
   );
   const {
     transcript,
