@@ -71,5 +71,17 @@ export function generateCommands(opts: GenerateCommandsOpts) {
         }, 500);
       },
     },
+    {
+      command: ["select all(.)"],
+      callback: () => {
+        if (dictationStateRef.current != "on") return;
+        setDictationState("paused");
+        textareaUtils.undoCurrentInsert();
+        textareaUtils.selectAll();
+        setTimeout(() => {
+          setDictationState("on");
+        }, 500);
+      },
+    },
   ];
 }

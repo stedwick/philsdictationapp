@@ -132,4 +132,8 @@ export class TextareaUtils {
     this.currentSelectionStart = this.textarea.selectionStart;
     this.currentSelectionEnd = this.textarea.selectionEnd;
   }
+
+  selectAll() {
+    this.textarea.setSelectionRange(0, this.textarea.value.length);
+  }
 }
