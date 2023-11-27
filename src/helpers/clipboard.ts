@@ -25,7 +25,7 @@ type CopyOpts = {
 };
 export function execCopy(
   textareaRef: React.RefObject<HTMLTextAreaElement>,
-  setDictationState: React.Dispatch<React.SetStateAction<string>>,
+  setDictationState: React.Dispatch<React.SetStateAction<any>>,
   userOpts: CopyOpts = {}
 ) {
   const opts = { toast: true, success: null, ...userOpts };
@@ -50,7 +50,7 @@ export function execCopy(
 
 export function execCut(
   textareaRef: React.RefObject<HTMLTextAreaElement>,
-  setDictationState: React.Dispatch<React.SetStateAction<string>>
+  setDictationState: React.Dispatch<React.SetStateAction<any>>
 ) {
   execCopy(textareaRef, setDictationState, {
     success: () => {
@@ -61,7 +61,7 @@ export function execCut(
 
 export function execPasteToApp(
   textareaRef: React.RefObject<HTMLTextAreaElement>,
-  setDictationState: React.Dispatch<React.SetStateAction<string>>
+  setDictationState: React.Dispatch<React.SetStateAction<any>>
 ) {
   execCopy(textareaRef, setDictationState, {
     toast: false,

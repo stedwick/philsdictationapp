@@ -1,4 +1,5 @@
 import { TextareaUtils } from "./TextareaUtils";
+import { execCopy, execCut, execPasteToApp } from "./clipboard";
 
 interface GenerateCommandsOpts {
   textareaUtils: TextareaUtils;
@@ -98,6 +99,45 @@ export function generateCommands(opts: GenerateCommandsOpts) {
           always: false,
           func: () => {
             textareaUtils.selectAll();
+          },
+        });
+      },
+    },
+    {
+      command: ["copy (that)(it)(.)"],
+      callback: () => {
+        around({
+          pause: true,
+          resume: false,
+          always: false,
+          func: () => {
+            execCopy(textareaUtils.textareaRef, setDictationState);
+          },
+        });
+      },
+    },
+    {
+      command: ["cut (that)(it)(.)"],
+      callback: () => {
+        around({
+          pause: true,
+          resume: false,
+          always: false,
+          func: () => {
+            execCut(textareaUtils.textareaRef, setDictationState);
+          },
+        });
+      },
+    },
+    {
+      command: ["paste (that)(it) (over) (to) (app)(.)"],
+      callback: () => {
+        around({
+          pause: true,
+          resume: false,
+          always: false,
+          func: () => {
+            execPasteToApp(textareaUtils.textareaRef, setDictationState);
           },
         });
       },
