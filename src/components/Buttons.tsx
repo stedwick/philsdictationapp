@@ -8,11 +8,11 @@ import {
   ScissorsIcon,
   StopIcon,
 } from "@heroicons/react/24/solid";
-import { copy, pasteToApp } from "../helpers/clipboard";
+import { execCopy, execCut, execPasteToApp } from "../helpers/clipboard";
 
 export const Buttons: React.FC<{
   dictationState: string;
-  setDictationState: Function;
+  setDictationState: React.Dispatch<React.SetStateAction<any>>;
   textareaRef: React.RefObject<HTMLTextAreaElement>;
 }> = ({ dictationState, setDictationState, textareaRef }) => {
   const pauseEnabled = dictationState == "on" ? "" : "btn-disabled";
@@ -79,13 +79,7 @@ export const Buttons: React.FC<{
         <button
           className="btn btn-outline btn-secondary"
           onClick={() => {
-            copy(textareaRef, {
-              toast: false,
-              success: () => {
-                pasteToApp();
-                textareaRef.current!.value = "";
-              },
-            });
+            execPasteToApp(textareaRef, setDictationState);
           }}
         >
           <ClipboardDocumentListIcon className="h-6 w-6"></ClipboardDocumentListIcon>
@@ -93,19 +87,13 @@ export const Buttons: React.FC<{
         </button>
         <button
           className="btn btn-outline btn-primary"
-          onClick={() => copy(textareaRef)}
+          onClick={() => execCopy(textareaRef, setDictationState)}
         >
           <ClipboardIcon className="h-6 w-6"></ClipboardIcon>Copy
         </button>
         <button
           className="btn btn-outline"
-          onClick={() => {
-            copy(textareaRef, {
-              success: () => {
-                textareaRef.current!.value = "";
-              },
-            });
-          }}
+          onClick={() => execCut(textareaRef, setDictationState)}
         >
           <ScissorsIcon className="h-6 w-6"></ScissorsIcon>Cut
         </button>

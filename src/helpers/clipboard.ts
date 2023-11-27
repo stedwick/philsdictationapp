@@ -10,7 +10,7 @@ import { invoke } from "@tauri-apps/api/tauri";
 //   toast.success(response);
 // }
 
-export async function pasteToApp() {
+export async function invokePasteToApp() {
   const response: boolean = await invoke("paste_to_app");
   if (response) {
     toast.success("Pasted");
@@ -23,13 +23,15 @@ type CopyOpts = {
   toast?: boolean;
   success?: Function | null;
 };
-export function copy(
+export function execCopy(
   textareaRef: React.RefObject<HTMLTextAreaElement>,
+  setDictationState: React.Dispatch<React.SetStateAction<string>>,
   userOpts: CopyOpts = {}
 ) {
   const opts = { toast: true, success: null, ...userOpts };
   const text = textareaRef.current?.value;
   if (text) {
+    setDictationState("paused");
     navigator.clipboard.writeText(text).then(
       () => {
         /* clipboard successfully set */
@@ -44,4 +46,28 @@ export function copy(
   } else {
     // toast("Nothing to copy", { icon: "✏️" });
   }
+}
+
+export function execCut(
+  textareaRef: React.RefObject<HTMLTextAreaElement>,
+  setDictationState: React.Dispatch<React.SetStateAction<string>>
+) {
+  execCopy(textareaRef, setDictationState, {
+    success: () => {
+      textareaRef.current!.value = "";
+    },
+  });
+}
+
+export function execPasteToApp(
+  textareaRef: React.RefObject<HTMLTextAreaElement>,
+  setDictationState: React.Dispatch<React.SetStateAction<string>>
+) {
+  execCopy(textareaRef, setDictationState, {
+    toast: false,
+    success: () => {
+      invokePasteToApp();
+      textareaRef.current!.value = "";
+    },
+  });
 }
