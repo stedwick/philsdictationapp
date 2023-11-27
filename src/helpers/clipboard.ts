@@ -42,6 +42,6 @@ export function copy(
       }
     );
   } else {
-    toast("Nothing to copy", { icon: "✏️" });
+    // toast("Nothing to copy", { icon: "✏️" });
   }
 }
