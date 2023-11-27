@@ -11,22 +11,38 @@ interface GenerateCommandsOpts {
 // TODO: Need a better way to store history and process commands without typing.
 export function generateCommands(opts: GenerateCommandsOpts) {
   const { textareaUtils, dictationStateRef, setDictationState } = opts;
+  function around(opts: {
+    func: Function;
+    pause: boolean;
+    resume: boolean;
+    always: boolean;
+  }) {
+    const { func, pause, resume, always } = opts;
+    if (pause) {
+      setDictationState("paused");
+      textareaUtils.undoCurrentInsert();
+    }
+    if (always || dictationStateRef.current == "on") func();
+    if (resume) {
+      setTimeout(() => {
+        setDictationState("on");
+        // textareaUtils.undoPreviousInsert();
+      }, 500);
+    }
+  }
+
   return [
     {
       command: ["pause(.)", "(go to) sleep(.)"],
       // callback: (obj: { command: string; resetTranscript: Function }) => {
       callback: () => {
-        setDictationState("paused");
-        textareaUtils.undoCurrentInsert();
+        around({ pause: true, resume: false, always: true, func: () => {} });
       },
     },
     {
       command: ["resume(.)", "wake up(.)"],
       callback: () => {
-        setTimeout(() => {
-          setDictationState("on");
-          // textareaUtils.undoPreviousInsert();
-        }, 500);
+        around({ pause: false, resume: true, always: true, func: () => {} });
       },
     },
     {
@@ -41,7 +57,7 @@ export function generateCommands(opts: GenerateCommandsOpts) {
       callback: () => {
         if (dictationStateRef.current != "on") return;
         setDictationState("paused");
-        textareaUtils.undoPreviousInsert();
+        textareaUtils.undoPreviousInsert(); // use around?
         setTimeout(() => {
           setDictationState("on");
         }, 500);
@@ -50,37 +66,40 @@ export function generateCommands(opts: GenerateCommandsOpts) {
     {
       command: ["(go to) beginning(.)", "(go) home(.)"],
       callback: () => {
-        if (dictationStateRef.current != "on") return;
-        setDictationState("paused");
-        textareaUtils.undoCurrentInsert();
-        textareaUtils.goHome();
-        setTimeout(() => {
-          setDictationState("on");
-        }, 500);
+        around({
+          pause: true,
+          resume: true,
+          always: false,
+          func: () => {
+            textareaUtils.goHome();
+          },
+        });
       },
     },
     {
       command: ["(go to) end(.)"],
       callback: () => {
-        if (dictationStateRef.current != "on") return;
-        setDictationState("paused");
-        textareaUtils.undoCurrentInsert();
-        textareaUtils.goEnd();
-        setTimeout(() => {
-          setDictationState("on");
-        }, 500);
+        around({
+          pause: true,
+          resume: true,
+          always: false,
+          func: () => {
+            textareaUtils.goEnd();
+          },
+        });
       },
     },
     {
       command: ["select all(.)"],
       callback: () => {
-        if (dictationStateRef.current != "on") return;
-        setDictationState("paused");
-        textareaUtils.undoCurrentInsert();
-        textareaUtils.selectAll();
-        setTimeout(() => {
-          setDictationState("on");
-        }, 500);
+        around({
+          pause: true,
+          resume: true,
+          always: false,
+          func: () => {
+            textareaUtils.selectAll();
+          },
+        });
       },
     },
   ];
