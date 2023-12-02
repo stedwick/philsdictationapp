@@ -6,8 +6,8 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "PhilsDictationApp",
-    "version": "0.0.0"
+    "productName": "18087PhilPDX.PhilsDictationApp",
+    "version": "1.0.0"
   },
   "tauri": {
     "allowlist": {
@@ -20,7 +20,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri-philsdictationapp.dev",
+      "identifier": "CN=185BEB8C-D0D8-46C6-B4D6-0062E3C7275E",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
