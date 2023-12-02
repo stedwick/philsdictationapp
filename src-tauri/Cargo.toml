@@ -1,5 +1,5 @@
 [package]
-name = "PhilsDictationApp"
+name = "phils_dictation_app"
 version = "1.0.0"
 description = "Phil's Dictation App"
 authors = ["CN=185BEB8C-D0D8-46C6-B4D6-0062E3C7275E"]

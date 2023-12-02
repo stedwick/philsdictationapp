@@ -9,6 +9,7 @@ import {
   StopIcon,
 } from "@heroicons/react/24/solid";
 import { execCopy, execCut, execPasteToApp } from "../helpers/clipboard";
+import { LayoutGridIcon } from "lucide-react";
 
 export const Buttons: React.FC<{
   dictationState: string;
@@ -76,15 +77,27 @@ export const Buttons: React.FC<{
       <div className="divider my-2 lg:hidden"></div>
 
       <div className="flex flex-wrap gap-2 justify-center">
-        <button
-          className="btn btn-outline btn-secondary"
-          onClick={() => {
-            execPasteToApp(textareaRef, setDictationState);
-          }}
-        >
-          <ClipboardDocumentListIcon className="h-6 w-6"></ClipboardDocumentListIcon>
-          Paste to app
-        </button>
+        {import.meta.env.VITE_WEB ? (
+          <a
+            href="https://www.microsoft.com/store/apps/9NTPHH45FFRN"
+            target="_blank"
+          >
+            <button className="btn btn-outline btn-secondary">
+              <LayoutGridIcon className="h-6 w-6"></LayoutGridIcon>
+              Download App
+            </button>
+          </a>
+        ) : (
+          <button
+            className="btn btn-outline btn-secondary"
+            onClick={() => {
+              execPasteToApp(textareaRef, setDictationState);
+            }}
+          >
+            <ClipboardDocumentListIcon className="h-6 w-6"></ClipboardDocumentListIcon>
+            Paste to app
+          </button>
+        )}
         <button
           className="btn btn-outline btn-primary"
           onClick={() => execCopy(textareaRef, setDictationState)}

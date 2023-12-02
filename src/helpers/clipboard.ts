@@ -11,10 +11,10 @@ import { invoke } from "@tauri-apps/api/tauri";
 // }
 
 export async function invokePasteToApp() {
-  const response: boolean = await invoke("paste_to_app");
-  if (response) {
+  try {
+    await invoke("paste_to_app");
     toast.success("Pasted");
-  } else {
+  } catch (error) {
     toast.error("Couldn't paste");
   }
 }
