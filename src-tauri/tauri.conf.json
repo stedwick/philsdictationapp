@@ -6,7 +6,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "Phil's Dictation App",
+    "productName": "PhilsDictationApp",
     "version": "0.0.0"
   },
   "tauri": {
