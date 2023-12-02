@@ -1,8 +1,8 @@
 [package]
-name = "tauri-app"
-version = "0.0.0"
-description = "A Tauri App"
-authors = ["you"]
+name = "PhilsDictationApp"
+version = "1.0.0"
+description = "Phil's Dictation App"
+authors = ["CN=185BEB8C-D0D8-46C6-B4D6-0062E3C7275E"]
 license = ""
 repository = ""
 edition = "2021"

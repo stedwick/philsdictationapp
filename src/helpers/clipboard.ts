@@ -31,7 +31,9 @@ export function execCopy(
   const opts = { toast: true, success: null, ...userOpts };
   const text = textareaRef.current?.value;
   if (text) {
-    setDictationState("paused");
+    setDictationState((currentState: "on" | "paused" | "off") =>
+      currentState == "on" ? "paused" : currentState
+    );
     navigator.clipboard.writeText(text).then(
       () => {
         /* clipboard successfully set */
