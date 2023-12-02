@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./App.css";
 import { Buttons } from "./components/Buttons";
 import { Toaster } from "react-hot-toast";
