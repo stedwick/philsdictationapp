@@ -59,6 +59,16 @@ export function usePhilSpeech(
     return () => clearInterval(intervalId); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
   }, []);
 
+  //
+  useEffect(() => {
+    window.addEventListener("focus", function () {
+      setDictationState("on");
+    });
+    window.addEventListener("blur", function () {
+      setDictationState("off");
+    });
+  }, []);
+
   // Controls the mic
   useEffect(() => {
     // user action
