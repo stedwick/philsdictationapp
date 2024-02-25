@@ -5,6 +5,12 @@ const punctuationMap: Record<string, string> = {
   // dash: "–",
   "question mark": "?",
   "exclamation mark": "!",
+  vanita: "Fanita",
+  vinita: "Fanita",
+  benita: "Fanita",
+  "my sink": "Syncta",
+  "century plus": "SentryPlus",
+  "new paragraph": "\n\n",
 };
 
 const punctuationRegex = new RegExp(
@@ -29,12 +35,18 @@ export default function punctuate(str: string) {
   // parentheses have special spacing rules
   str = str.replace(/open[ -]parentheses\s+/gi, "(");
   str = str.replace(/\s+close[ -]parentheses/gi, ")");
+  str = str.replace(/\s+apostrophes/gi, "'s");
 
   // capitalize the first letter of each sentence
-  str = str.replace(/^.*?\w|[.?!]\s.*?\w/gi, (letter) => letter.toUpperCase());
+  str = str.replace(/^.*?\w|[.?!]\s.*?\w/gi, (letters) =>
+    letters.toUpperCase()
+  );
+  str = str.replace(/^.*?(\w)/gim, (_letters, firstWordLetter) =>
+    firstWordLetter.toUpperCase()
+  );
   // I don't want the letter after a.m. or p.m. to be capitalized
-  str = str.replace(/[ap]\.m\. \w|/gi, (ampmLetter) =>
-    ampmLetter.toLowerCase()
+  str = str.replace(/[ap]\.m\. \w|/gi, (ampmLetters) =>
+    ampmLetters.toLowerCase()
   );
   // trim whitespace
   str = str.trim();
