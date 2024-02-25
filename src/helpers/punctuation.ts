@@ -1,21 +1,42 @@
-const punctuationMap = {
+const punctuationMap: Record<string, string> = {
   comma: ",",
   period: ".",
   colon: ":",
-  "open quote": '"',
-  "close quote": '"',
+  // dash: "–",
+  "question mark": "?",
+  "exclamation mark": "!",
 };
 
-str =
-  "open quote phenita apostrophes dog comma close quote named century plus comma is good dashboard period open quote phenita apostrophes dog comma close quote named century plus comma is good colon dashboard period";
-str = str.replace(
-  /\s*comma|\s*period|\s*colon|open quote\s*|\s*close quote/gi,
-  function (matched) {
-    for (const key in punctuationMap) {
-      if (matched.includes(key)) return punctuationMap[key];
-    }
-  }
+const punctuationRegex = new RegExp(
+  Object.keys(punctuationMap).join("|"),
+  // "\b" + Object.keys(punctuationMap).join("\b|\b") + "\b",
+  "gi"
 );
 
-str = str.replace(/^.*?\w|\..*?\w/gi, (w) => w.toUpperCase());
-str = str.trim();
+export default function punctuate(str: string) {
+  // punctuate
+  str = str.replace(punctuationRegex, function (matched: string) {
+    const matchedLowerCase = matched.toLowerCase();
+    const mappedValue = punctuationMap[matchedLowerCase];
+    return mappedValue || matched;
+  });
+
+  // some punctuation has no space before (:,.)
+  str = str.replace(/\s+([,.:?!])/gi, "$1");
+  // quotes have special spacing rules
+  str = str.replace(/open[ -]quote\s+/gi, '"');
+  str = str.replace(/\s+close[ -]quote/gi, '"');
+  // parentheses have special spacing rules
+  str = str.replace(/open[ -]parentheses\s+/gi, "(");
+  str = str.replace(/\s+close[ -]parentheses/gi, ")");
+
+  // capitalize the first letter of each sentence
+  str = str.replace(/^.*?\w|[.?!]\s.*?\w/gi, (letter) => letter.toUpperCase());
+  // I don't want the letter after a.m. or p.m. to be capitalized
+  str = str.replace(/[ap]\.m\. \w|/gi, (ampmLetter) =>
+    ampmLetter.toLowerCase()
+  );
+  // trim whitespace
+  str = str.trim();
+  return str;
+}
