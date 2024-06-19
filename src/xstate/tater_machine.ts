@@ -1,4 +1,6 @@
-import { setup, fromPromise, assign } from "xstate";
+import { setup, fromPromise, assign, spawnChild } from "xstate";
+import initSpeechAPI from "./logic/init_speech_api_async";
+import speechApiLogic from "./logic/speech_api_callback";
 
 export const taterMachine = setup({
   types: {
@@ -11,8 +13,12 @@ export const taterMachine = setup({
     loadSavedText: function () {},
     punctuateText: function () {},
     updateTextarea: function () {},
-    turnMicOn: function () {},
-    turnMicOff: function () {},
+    turnMicOn: function ({ context }) {
+      context.recognition.start();
+    },
+    turnMicOff: function ({ context }) {
+      context.recognition.stop();
+    },
     checkSpeechResult: function () {},
     checkForVoiceCommand: function () {},
     setVoiceCommand: function () {},
@@ -20,8 +26,8 @@ export const taterMachine = setup({
     resetSpeechCycle: function () {},
   },
   actors: {
-    initSpeechAPI: fromPromise(async function () {}),
-    speechAPIMachine: fromPromise(async function () {}),
+    initSpeechAPI: fromPromise(initSpeechAPI),
+    speechAPIMachine: speechApiLogic,
     voiceCommandMachine: fromPromise(async function () {}),
   },
   guards: {
@@ -70,7 +76,22 @@ export const taterMachine = setup({
       },
       invoke: {
         src: "initSpeechAPI",
-        onDone: { target: "initialized" },
+        onDone: {
+          target: "initialized",
+          actions: [
+            assign({
+              recognition: ({ event }) => event.output,
+            }),
+            assign({
+              speechApi: ({ context, spawn }) => {
+                return spawn("speechAPIMachine", {
+                  id: "speechAPIMachine",
+                  input: { recognition: context.recognition },
+                });
+              },
+            }),
+          ],
+        },
         onError: { target: "errored" },
       },
     },
@@ -99,9 +120,6 @@ export const taterMachine = setup({
             turnOff: {
               target: "off",
             },
-          },
-          invoke: {
-            src: "speechAPIMachine",
           },
           states: {
             asleep: {

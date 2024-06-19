@@ -38,8 +38,10 @@ function App() {
     function subscribeToTater() {
       const subscription = taterRef.subscribe((snapshot) => {
         // simple logging
-        // console.log(snapshot.value);
-        // console.log(snapshot.context);
+        console.log("VALUE:");
+        console.log(snapshot.value);
+        console.log("CONTEXT:");
+        console.log(snapshot.context);
         // if (snapshot.matches("initialized")) console.log("BOOM");
       });
 
@@ -51,6 +53,7 @@ function App() {
   useEffect(
     function initializeTater() {
       taterRef.send({ type: "initialize" });
+      window.taterRef = taterRef;
     },
     [taterRef]
   ); // note: actor ref should never change
