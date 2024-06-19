@@ -1,11 +1,12 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import "./App.css";
 import { Buttons } from "./components/Buttons";
 import { Toaster } from "react-hot-toast";
 import { useNetworkState } from "@uidotdev/usehooks";
-import { usePhilSpeech } from "./hooks/usePhilSpeech";
+// import { usePhilSpeech } from "./hooks/usePhilSpeech";
 import Indicators from "./components/Indicators";
 import MicErrors from "./components/MicErrors";
+import { taterMachineContext } from "./xstate/tater_context";
 
 function App() {
   const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
@@ -14,16 +15,45 @@ function App() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const network = useNetworkState();
 
-  const {
-    // transcript,
-    // interimTranscript,
-    // finalTranscript,
-    // resetTranscript,
-    listening,
-    browserSupportsSpeechRecognition,
-    // browserSupportsContinuousListening,
-    isMicrophoneAvailable,
-  } = usePhilSpeech(dictationState, setDictationState, textareaRef);
+  // const {
+  //   // transcript,
+  //   // interimTranscript,
+  //   // finalTranscript,
+  //   // resetTranscript,
+  //   listening,
+  //   browserSupportsSpeechRecognition,
+  //   // browserSupportsContinuousListening,
+  //   isMicrophoneAvailable,
+  // } = usePhilSpeech(dictationState, setDictationState, textareaRef);
+
+  const [listening, browserSupportsSpeechRecognition, isMicrophoneAvailable] = [
+    false,
+    true,
+    true,
+  ];
+
+  const taterRef = taterMachineContext.useActorRef();
+
+  useEffect(
+    function subscribeToTater() {
+      const subscription = taterRef.subscribe((snapshot) => {
+        // simple logging
+        // console.log(snapshot.value);
+        // console.log(snapshot.context);
+        // if (snapshot.matches("initialized")) console.log("BOOM");
+      });
+
+      return subscription.unsubscribe;
+    },
+    [taterRef]
+  ); // note: actor ref should never change
+
+  useEffect(
+    function initializeTater() {
+      taterRef.send({ type: "initialize" });
+    },
+    [taterRef]
+  ); // note: actor ref should never change
 
   return (
     <>
