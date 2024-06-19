@@ -7,6 +7,8 @@ import { useNetworkState } from "@uidotdev/usehooks";
 import Indicators from "./components/Indicators";
 import MicErrors from "./components/MicErrors";
 import { taterMachineContext } from "./xstate/tater_context";
+import subscribeToTater from "./xstate/effects/subscribe_to_tater";
+import initializeTater from "./xstate/effects/initialize_tater";
 
 function App() {
   const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
@@ -15,6 +17,8 @@ function App() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const network = useNetworkState();
 
+  // Old usePhilSpeech
+  //
   // const {
   //   // transcript,
   //   // interimTranscript,
@@ -26,37 +30,17 @@ function App() {
   //   isMicrophoneAvailable,
   // } = usePhilSpeech(dictationState, setDictationState, textareaRef);
 
+  // Fake
   const [listening, browserSupportsSpeechRecognition, isMicrophoneAvailable] = [
     false,
     true,
     true,
   ];
 
+  // New XState 'Tater Machine
   const taterRef = taterMachineContext.useActorRef();
-
-  useEffect(
-    function subscribeToTater() {
-      const subscription = taterRef.subscribe((snapshot) => {
-        // simple logging
-        console.log("VALUE:");
-        console.log(snapshot.value);
-        console.log("CONTEXT:");
-        console.log(snapshot.context);
-        // if (snapshot.matches("initialized")) console.log("BOOM");
-      });
-
-      return subscription.unsubscribe;
-    },
-    [taterRef]
-  ); // note: actor ref should never change
-
-  useEffect(
-    function initializeTater() {
-      taterRef.send({ type: "initialize" });
-      window.taterRef = taterRef;
-    },
-    [taterRef]
-  ); // note: actor ref should never change
+  useEffect(() => subscribeToTater(taterRef), [taterRef]); // for logging
+  useEffect(() => initializeTater(taterRef), [taterRef]); // init Web Speech API
 
   return (
     <>
@@ -71,6 +55,7 @@ function App() {
 
         <div className="w-full my-4 flex-grow relative">
           <textarea
+            id="taterTextarea"
             placeholder="Click 🎙️ Start Dictating button below..."
             className="textarea textarea-primary textarea-lg w-full h-full"
             ref={textareaRef}

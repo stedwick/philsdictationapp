@@ -1,4 +1,4 @@
-import { setup, fromPromise, assign, spawnChild } from "xstate";
+import { setup, fromPromise, assign } from "xstate";
 import initSpeechAPI from "./logic/init_speech_api_async";
 import speechApiLogic from "./logic/speech_api_callback";
 
@@ -10,20 +10,20 @@ export const taterMachine = setup({
   },
   actions: {
     saveText: function () {},
-    loadSavedText: function () {},
+    loadSavedText: ({ context: { textareaEl } }) => {
+      textareaEl.value; // = "hi";
+    },
     punctuateText: function () {},
     updateTextarea: function () {},
-    turnMicOn: function ({ context }) {
-      context.recognition.start();
-    },
-    turnMicOff: function ({ context }) {
-      context.recognition.stop();
-    },
+    turnMicOn: ({ context: { recognition } }) => recognition.start(),
+    turnMicOff: ({ context: { recognition } }) => recognition.stop(),
     checkSpeechResult: function () {},
     checkForVoiceCommand: function () {},
     setVoiceCommand: function () {},
     execCmd: function () {},
     resetSpeechCycle: function () {},
+    logHeard: ({ event }) =>
+      console.log(`>>>>> Heard: ${event.result[0].transcript}`),
   },
   actors: {
     initSpeechAPI: fromPromise(initSpeechAPI),
@@ -57,9 +57,7 @@ export const taterMachine = setup({
     },
   },
 }).createMachine({
-  context: ({ input }) => ({
-    textareaId: input.textareaId,
-  }),
+  context: ({ input: { textareaId } }) => ({ textareaId }),
   id: "Tater",
   initial: "uninitialized",
   states: {
@@ -67,6 +65,12 @@ export const taterMachine = setup({
       on: {
         initialize: {
           target: "initializing",
+          actions: assign({
+            textareaEl: ({ context }) =>
+              document.getElementById(
+                context.textareaId
+              ) as HTMLTextAreaElement,
+          }),
         },
       },
     },
@@ -83,10 +87,10 @@ export const taterMachine = setup({
               recognition: ({ event }) => event.output,
             }),
             assign({
-              speechApi: ({ context, spawn }) => {
+              speechApi: ({ context: { recognition }, spawn }) => {
                 return spawn("speechAPIMachine", {
                   id: "speechAPIMachine",
-                  input: { recognition: context.recognition },
+                  input: { recognition },
                 });
               },
             }),
@@ -139,6 +143,7 @@ export const taterMachine = setup({
                 },
                 hear: {
                   target: "hearing",
+                  actions: "logHeard",
                 },
               },
             },

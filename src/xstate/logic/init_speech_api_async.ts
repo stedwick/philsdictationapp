@@ -8,7 +8,7 @@ export default async function initSpeechAPI() {
   // window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
   const colors = [
-    "Syncta",
+    "Syncta", // doesn't work
     "aqua",
     "azure",
     "beige",
