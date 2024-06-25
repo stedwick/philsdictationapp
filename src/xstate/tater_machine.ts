@@ -1,12 +1,25 @@
 import { setup, fromPromise, assign } from "xstate";
 import initSpeechAPI from "./logic/init_speech_api_async";
 import speechApiLogic from "./logic/speech_api_callback";
+import readTextareaValues from "./helpers/read_textarea";
 
 export const taterMachine = setup({
   types: {
     input: {} as {
       textareaId: string;
     },
+    // context: {} as {
+    //   recognition: SpeechRecognition | undefined;
+    //   textareaId: string;
+    //   textareaEl: HTMLTextAreaElement | undefined;
+    //   textareaCurrentValues:
+    //     | {
+    //         valueBeforeSelection: string | undefined;
+    //         valueOfSelection: string | undefined;
+    //         valueAfterSelection: string | undefined;
+    //       }
+    //     | undefined;
+    // },
   },
   actions: {
     saveText: function () {},
@@ -14,7 +27,12 @@ export const taterMachine = setup({
       textareaEl.value; // = "hi";
     },
     punctuateText: function () {},
-    updateTextarea: function () {},
+    // readTextarea: readTextarea,
+    writeTextarea: function ({ context: { textareaEl, newText } }) {
+      const values = readTextareaValues(textareaEl);
+      textareaEl.value =
+        values.beforeSelection + " " + newText + " " + values.afterSelection;
+    },
     turnMicOn: ({ context: { recognition } }) => recognition.start(),
     turnMicOff: ({ context: { recognition } }) => recognition.stop(),
     checkSpeechResult: function () {},
@@ -57,7 +75,7 @@ export const taterMachine = setup({
     },
   },
 }).createMachine({
-  context: ({ input: { textareaId } }) => ({ textareaId }),
+  context: ({ input }) => ({ textareaId: input.textareaId }),
   id: "Tater",
   initial: "uninitialized",
   states: {
@@ -143,7 +161,12 @@ export const taterMachine = setup({
                 },
                 hear: {
                   target: "hearing",
-                  actions: "logHeard",
+                  actions: [
+                    assign({
+                      newText: ({ event }) => event.result[0].transcript,
+                    }),
+                    "logHeard",
+                  ],
                 },
               },
             },
@@ -204,9 +227,11 @@ export const taterMachine = setup({
               },
             },
             writing: {
-              entry: {
-                type: "updateTextarea",
-              },
+              entry: [
+                {
+                  type: "writeTextarea",
+                },
+              ],
               always: {
                 target: "saving",
               },
