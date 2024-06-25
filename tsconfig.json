@@ -21,7 +21,8 @@
     "noFallthroughCasesInSwitch": true
 
     // Philip
-    // "noUnusedParameters": false
+    // "noUnusedParameters": false,
+    // "noImplicitAny": false
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

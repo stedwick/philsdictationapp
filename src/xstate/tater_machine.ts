@@ -2,6 +2,7 @@ import { setup, fromPromise, assign } from "xstate";
 import initSpeechAPI from "./logic/init_speech_api_async";
 import speechApiLogic from "./logic/speech_api_callback";
 import readTextareaValues from "./helpers/read_textarea";
+import writeTextarea from "./actions/write_textarea";
 
 export const taterMachine = setup({
   types: {
@@ -28,11 +29,12 @@ export const taterMachine = setup({
     },
     punctuateText: function () {},
     // readTextarea: readTextarea,
-    writeTextarea: function ({ context: { textareaEl, newText } }) {
-      const values = readTextareaValues(textareaEl);
-      textareaEl.value =
-        values.beforeSelection + " " + newText + " " + values.afterSelection;
-    },
+    writeTextarea,
+    // writeTextarea: function ({ context: { textareaEl, newText } }) {
+    //   const values = readTextareaValues(textareaEl);
+    //   textareaEl.value =
+    //     values.beforeSelection + " " + newText + " " + values.afterSelection;
+    // },
     turnMicOn: ({ context: { recognition } }) => recognition.start(),
     turnMicOff: ({ context: { recognition } }) => recognition.stop(),
     checkSpeechResult: function () {},
@@ -228,8 +230,16 @@ export const taterMachine = setup({
             },
             writing: {
               entry: [
+                assign({
+                  currentValues: ({ context: { textareaEl } }: any) =>
+                    readTextareaValues(textareaEl),
+                }),
                 {
                   type: "writeTextarea",
+                  params: ({ context: { textareaEl, newText } }) => ({
+                    textareaEl,
+                    newText,
+                  }),
                 },
               ],
               always: {
