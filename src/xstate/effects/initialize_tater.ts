@@ -1,8 +1,6 @@
-import { useActorRef } from "@xstate/react";
+import { AnyActorRef } from "xstate";
 
-type actorRef = ReturnType<typeof useActorRef>;
-
-export default function initializeTater(taterRef: actorRef) {
+export default function initializeTater(taterRef: AnyActorRef) {
   taterRef.send({ type: "initialize" });
-  window.taterRef = taterRef;
+  window.taterRef = taterRef; // DEBUG
 }

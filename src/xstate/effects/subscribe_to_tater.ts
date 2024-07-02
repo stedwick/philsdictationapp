@@ -1,15 +1,13 @@
-import { useActorRef } from "@xstate/react";
+import { AnyActorRef } from "xstate";
 
-type actorRef = ReturnType<typeof useActorRef>;
-
-export default function subscribeToTater(taterRef: actorRef) {
+export default function subscribeToTater(taterRef: AnyActorRef) {
   const subscription = taterRef.subscribe((snapshot) => {
-    // simple logging
+    // DEBUG
     console.log("VALUE:");
     console.log(snapshot.value);
     console.log("CONTEXT:");
     console.log(snapshot.context);
-    // if (snapshot.matches("initialized")) console.log("BOOM");
+    if (snapshot.matches("initialized")) console.log("BOOM initialized");
   });
 
   return subscription.unsubscribe;

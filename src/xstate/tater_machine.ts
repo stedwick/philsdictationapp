@@ -1,14 +1,15 @@
 import { setup, fromPromise, assign } from "xstate";
-import initSpeechAPI from "./logic/init_speech_api_async";
-import speechApiLogic from "./logic/speech_api_callback";
-import readTextareaValues from "./helpers/read_textarea";
-import writeTextarea from "./actions/write_textarea";
+import initSpeechAPILogic from "./logic/init_speech_api_promise";
+import speechAPILogic from "./logic/speech_api_callback";
+import { readTextarea, writeTextarea } from "./helpers/textarea";
+import { TaterContext, initialTaterContext } from "./types/tater_context";
 
 export const taterMachine = setup({
   types: {
     input: {} as {
       textareaId: string;
     },
+    context: {} as TaterContext,
     // context: {} as {
     //   recognition: SpeechRecognition | undefined;
     //   textareaId: string;
@@ -25,18 +26,22 @@ export const taterMachine = setup({
   actions: {
     saveText: function () {},
     loadSavedText: ({ context: { textareaEl } }) => {
-      textareaEl.value; // = "hi";
+      textareaEl!.value; // = "hi";
     },
     punctuateText: function () {},
     // readTextarea: readTextarea,
-    writeTextarea,
+    writeTextarea: ({ context: { textareaNewValues, textareaEl } }) =>
+      writeTextarea({
+        textareaNewValues,
+        textareaEl,
+      }),
     // writeTextarea: function ({ context: { textareaEl, newText } }) {
     //   const values = readTextareaValues(textareaEl);
     //   textareaEl.value =
     //     values.beforeSelection + " " + newText + " " + values.afterSelection;
     // },
-    turnMicOn: ({ context: { recognition } }) => recognition.start(),
-    turnMicOff: ({ context: { recognition } }) => recognition.stop(),
+    turnMicOn: ({ context: { recognition } }) => recognition!.start(),
+    turnMicOff: ({ context: { recognition } }) => recognition!.stop(),
     checkSpeechResult: function () {},
     checkForVoiceCommand: function () {},
     setVoiceCommand: function () {},
@@ -46,8 +51,8 @@ export const taterMachine = setup({
       console.log(`>>>>> Heard: ${event.result[0].transcript}`),
   },
   actors: {
-    initSpeechAPI: fromPromise(initSpeechAPI),
-    speechAPIMachine: speechApiLogic,
+    initSpeechAPI: initSpeechAPILogic,
+    speechAPI: speechAPILogic,
     voiceCommandMachine: fromPromise(async function () {}),
   },
   guards: {
@@ -77,7 +82,10 @@ export const taterMachine = setup({
     },
   },
 }).createMachine({
-  context: ({ input }) => ({ textareaId: input.textareaId }),
+  context: ({ input }) => ({
+    ...initialTaterContext,
+    textareaId: input.textareaId,
+  }),
   id: "Tater",
   initial: "uninitialized",
   states: {
@@ -88,7 +96,7 @@ export const taterMachine = setup({
           actions: assign({
             textareaEl: ({ context }) =>
               document.getElementById(
-                context.textareaId
+                context.textareaId!
               ) as HTMLTextAreaElement,
           }),
         },
@@ -107,8 +115,9 @@ export const taterMachine = setup({
               recognition: ({ event }) => event.output,
             }),
             assign({
-              speechApi: ({ context: { recognition }, spawn }) => {
-                return spawn("speechAPIMachine", {
+              speechApi: ({ context, spawn }) => {
+                const recognition = context.recognition!;
+                return spawn("speechAPI", {
                   id: "speechAPIMachine",
                   input: { recognition },
                 });
@@ -231,15 +240,14 @@ export const taterMachine = setup({
             writing: {
               entry: [
                 assign({
-                  currentValues: ({ context: { textareaEl } }: any) =>
-                    readTextareaValues(textareaEl),
+                  textareaNewValues: ({ context }) => ({
+                    beforeSelection: null,
+                    selection: context.newText,
+                    afterSelection: null,
+                  }),
                 }),
                 {
                   type: "writeTextarea",
-                  params: ({ context: { textareaEl, newText } }) => ({
-                    textareaEl,
-                    newText,
-                  }),
                 },
               ],
               always: {

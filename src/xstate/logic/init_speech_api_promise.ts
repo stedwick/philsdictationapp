@@ -1,5 +1,7 @@
+import { fromPromise } from "xstate";
+
 // https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API
-export default async function initSpeechAPI() {
+export default fromPromise(async function () {
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
   const SpeechGrammarList =
@@ -8,7 +10,7 @@ export default async function initSpeechAPI() {
   // window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
   const colors = [
-    "Syncta", // doesn't work
+    "Syncta", // TODO
     "aqua",
     "azure",
     "beige",
@@ -34,4 +36,4 @@ export default async function initSpeechAPI() {
   recognition.maxAlternatives = 1;
 
   return recognition;
-}
+});
