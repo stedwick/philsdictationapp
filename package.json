@@ -14,13 +14,16 @@
     "@mariojgt/wind-notify": "^0.1.2",
     "@tauri-apps/api": "^1.5.1",
     "@uidotdev/usehooks": "^2.4.1",
+    "@xstate/cli": "^0.5.17",
+    "@xstate/react": "^4.1.1",
     "lucide-react": "^0.292.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1",
     "react-speech-recognition": "^3.10.0",
     "regenerator-runtime": "^0.14.0",
-    "use-navigator-online": "^3.2.4"
+    "use-navigator-online": "^3.2.4",
+    "xstate": "^5.13.2"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.5.6",
@@ -32,7 +35,7 @@
     "daisyui": "^4.4.2",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
-    "typescript": "^5.0.2",
+    "typescript": "^5.4.5",
     "vite": "^4.4.4"
   }
 }
