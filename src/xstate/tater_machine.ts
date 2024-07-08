@@ -1,5 +1,6 @@
-import { assign, fromPromise, setup } from "xstate";
-import { writeTextarea } from "./helpers/textarea";
+import toast from "react-hot-toast";
+import { assign, fromPromise, raise, setup } from "xstate";
+import { readTextarea, writeTextarea } from "./helpers/textarea";
 import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import speechAPILogic from "./logic/speech_api_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
@@ -23,6 +24,17 @@ export const taterMachine = setup({
         textareaNewValues,
         textareaEl,
       }),
+    cutText: function ({ context: { textareaEl } }) {
+      navigator.clipboard.writeText(textareaEl.value).then(
+        () => {
+          toast.success("Copied to clipboard");
+          textareaEl.value = "";
+        },
+        () => {
+          toast.error("Couldn't access clipboard");
+        }
+      );
+    },
     turnMicOn: ({ context: { recognition } }) => recognition!.start(),
     turnMicOff: ({ context: { recognition } }) => recognition!.stop(),
     checkSpeechResult: function () {},
@@ -31,6 +43,7 @@ export const taterMachine = setup({
     execCmd: function () {},
     resetSpeechCycle: function () {},
     logHeard: ({ event }) =>
+      // DEBUG
       console.log(`>>>>> Heard: ${event.result[0].transcript}`),
   },
   actors: {
@@ -86,9 +99,7 @@ export const taterMachine = setup({
       },
     },
     initializing: {
-      entry: {
-        type: "loadSavedText",
-      },
+      entry: [{ type: "loadSavedText" }],
       invoke: {
         src: "initSpeechAPI",
         onDone: {
@@ -98,7 +109,8 @@ export const taterMachine = setup({
               recognition: ({ event }) => event.output,
             }),
             assign({
-              speechApi: ({ context, spawn }) => {
+              speechApi: (params) => {
+                const { context, spawn } = params;
                 const recognition = context.recognition!;
                 return spawn("speechAPI", {
                   id: "speechAPIMachine",
@@ -116,6 +128,19 @@ export const taterMachine = setup({
     },
     initialized: {
       initial: "off",
+      on: {
+        cut: {
+          actions: [{ type: "cutText" }],
+        },
+        textareaInput: {
+          actions: [
+            assign({
+              textareaCurrentValues: ({ context }) =>
+                readTextarea(context.textareaEl),
+            }),
+          ],
+        },
+      },
       states: {
         off: {
           on: {
@@ -149,6 +174,7 @@ export const taterMachine = setup({
             },
             awake: {
               entry: assign({ micState: "awake" }),
+              after: { 5000: { target: "asleep" } },
               on: {
                 sleep: {
                   target: "asleep",
@@ -232,6 +258,8 @@ export const taterMachine = setup({
                 {
                   type: "writeTextarea",
                 },
+                // Setting the value directly does not trigger an input event. Typing and pasting does.
+                raise({ type: "textareaInput" }),
               ],
               always: {
                 target: "saving",

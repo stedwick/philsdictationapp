@@ -15,45 +15,50 @@ export const Buttons = () => {
   const taterRef = taterMachineContext.useActorRef();
 
   const micState = taterMachineContext.useSelector(micStateSelector);
-  const textareaValue = taterMachineContext.useSelector(textareaValueSelector);
 
-  // TODO Cut button
-  const cutEnabled = textareaValue ? "" : "btn-disabled";
+  // HARD Cut button
+  // const textareaValue = taterMachineContext.useSelector(textareaValueSelector);
+  // const cutEnabled = textareaValue ? "" : "btn-disabled";
 
   return (
     <div className="flex flex-wrap justify-center lg:justify-between flex-col lg:flex-row gap-x-12 mb-2">
       <div className="flex flex-wrap justify-center gap-2">
-        {micState == "off" && (
-          <button
-            className="btn btn-outline btn-error"
-            onClick={() => taterRef.send({ type: "turnOn" })}
-          >
-            <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>Start Dictating
-            {/* TODO button hover */}
-          </button>
-        )}
-        {micState == "awake" && (
-          <button
-            className="btn btn-error relative"
-            onClick={() => taterRef.send({ type: "turnOff" })}
-          >
-            <MicrophoneIcon className="h-6 w-6 animate-ping absolute left-4"></MicrophoneIcon>
-            <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>
-            Dictating...
-          </button>
-        )}
-        {micState == "asleep" && (
-          <button
-            className="btn btn-outline"
-            onClick={() => taterRef.send({ type: "wake" })}
-          >
-            <BellSnoozeIcon className="h-6 w-6"></BellSnoozeIcon>Say "wake up"
-          </button>
-        )}
+        <div className="group">
+          {micState == "off" && (
+            <button
+              className="btn btn-outline btn-error"
+              onClick={() => taterRef.send({ type: "turnOn" })}
+            >
+              <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>Start
+              Dictating
+            </button>
+          )}
+          {micState == "awake" && (
+            <button
+              className="btn btn-error relative"
+              onClick={() => taterRef.send({ type: "turnOff" })}
+            >
+              <MicrophoneIcon className="h-6 w-6 animate-ping absolute left-4"></MicrophoneIcon>
+              <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>
+              <span>Dictating...</span>
+              {/* <span className="hidden group-hover:inline">
+                Say "turn off"...
+              </span> */}
+            </button>
+          )}
+          {micState == "asleep" && (
+            <button
+              className="btn btn-outline"
+              onClick={() => taterRef.send({ type: "wake" })}
+            >
+              <BellSnoozeIcon className="h-6 w-6"></BellSnoozeIcon>Say "wake up"
+            </button>
+          )}
+        </div>
         <button
-          className={"btn btn-outline " + cutEnabled}
+          className="btn btn-outline"
           // TODO Cut action
-          onClick={() => console.log("Will cut")}
+          onClick={() => taterRef.send({ type: "cut" })}
         >
           <ScissorsIcon className="h-6 w-6"></ScissorsIcon>Cut
         </button>

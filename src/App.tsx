@@ -12,9 +12,11 @@ import { taterMachineContext } from "./xstate/tater_machine_context";
 
 function App() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  // TODO Check internet connection
   const network = useNetworkState();
 
   // Fake
+  // TODO Check web speech API support
   const [listening, browserSupportsSpeechRecognition, isMicrophoneAvailable] = [
     false,
     true,
