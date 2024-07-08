@@ -1,36 +1,48 @@
 import { MicrophoneIcon } from "@heroicons/react/24/solid";
-import { NetworkState } from "@uidotdev/usehooks";
-import { WifiOff, Wifi } from "lucide-react";
+import { Wifi, WifiOff } from "lucide-react";
+import { useEffect, useState } from "react";
+import { AnyMachineSnapshot } from "xstate";
+import { taterMachineContext } from "../xstate/tater_machine_context";
 
-export default function Indicators(props: {
-  listening: boolean;
-  network: NetworkState;
-}) {
-  const { listening, network } = props;
+const listeningSelector = (state: AnyMachineSnapshot) =>
+  state.context.micState != "off";
+
+export default function Indicators() {
+  const isListening = taterMachineContext.useSelector(listeningSelector);
+  const [isOnline, setIsOnline] = useState(true);
+
+  useEffect(() => {
+    const onlineInterval = setInterval(
+      () => setIsOnline(navigator.onLine),
+      5000
+    );
+    return () => clearInterval(onlineInterval);
+  }, [setIsOnline]);
+
   return (
     <>
-      {!listening && (
+      {!isListening && (
         <div className="tooltip" data-tip="Mic off">
           <span className="badge badge-outline badge-neutral">
             <MicrophoneIcon className="h-4 w-4"></MicrophoneIcon>
           </span>
         </div>
       )}
-      {listening && (
+      {isListening && (
         <div className="tooltip" data-tip="Mic listening">
           <span className="badge badge-outline badge-success">
             <MicrophoneIcon className="h-4 w-4"></MicrophoneIcon>
           </span>
         </div>
       )}
-      {!network.online && (
+      {!isOnline && (
         <div className="tooltip" data-tip="Offline">
           <span className="badge badge-outline badge-neutral">
             <WifiOff className="h-4 w-4" />
           </span>
         </div>
       )}
-      {network.online && (
+      {isOnline && (
         <div className="tooltip" data-tip="Online">
           <span className="badge badge-outline badge-primary">
             <Wifi className="h-4 w-4" />
