@@ -1,5 +1,5 @@
-import toast from "react-hot-toast";
 import { assign, fromPromise, raise, setup } from "xstate";
+import cutText from "./actions/cut_text";
 import { readTextarea, writeTextarea } from "./helpers/textarea";
 import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import speechAPILogic from "./logic/speech_api_callback";
@@ -14,27 +14,14 @@ export const taterMachine = setup({
   },
   actions: {
     saveText: function () {},
-    loadSavedText: ({ context: { textareaEl } }) => {
-      // TODO save & load
-      textareaEl!.value; // = "hi";
-    },
+    loadSavedText: () => {},
     punctuateText: function () {},
     writeTextarea: ({ context: { textareaNewValues, textareaEl } }) =>
       writeTextarea({
         textareaNewValues,
         textareaEl,
       }),
-    cutText: function ({ context: { textareaEl } }) {
-      navigator.clipboard.writeText(textareaEl.value).then(
-        () => {
-          toast.success("Copied to clipboard");
-          textareaEl.value = "";
-        },
-        () => {
-          toast.error("Couldn't access clipboard");
-        }
-      );
-    },
+    cutText: ({ context: { textareaEl } }) => cutText(textareaEl),
     turnMicOn: ({ context: { recognition } }) => recognition!.start(),
     turnMicOff: ({ context: { recognition } }) => recognition!.stop(),
     checkSpeechResult: function () {},
