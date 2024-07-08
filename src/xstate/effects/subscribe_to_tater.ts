@@ -2,9 +2,14 @@ import { AnyActorRef } from "xstate";
 
 export default function subscribeToTater(taterRef: AnyActorRef) {
   if (import.meta.env.VITE_DEBUG) {
+    let timeoutId: NodeJS.Timeout | null = null;
+    const debounceRate = 1500; // 0.5 seconds
+
     const subscription = taterRef.subscribe((snapshot) => {
-      console.log(snapshot.value);
-      console.log(snapshot.context.textareaCurrentValues);
+      timeoutId && clearTimeout(timeoutId);
+      timeoutId = setTimeout(function () {
+        console.log(snapshot);
+      }, debounceRate);
     });
 
     return subscription.unsubscribe;
