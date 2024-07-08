@@ -10,7 +10,7 @@ export default fromPromise(async function () {
   // window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
   // const colors = [
-  //   "Santa", // TODO custom words
+  //   "Santa", // HARD custom words
   //   "aqua",
   //   "azure",
   //   "beige",

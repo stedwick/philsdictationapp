@@ -9,7 +9,6 @@ interface GenerateCommandsOpts {
   >;
 }
 
-// TODO: Need a better way to store history and process commands without typing.
 export function generateCommands(opts: GenerateCommandsOpts) {
   const { textareaUtils, dictationStateRef, setDictationState } = opts;
   function around(opts: {

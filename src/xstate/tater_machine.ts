@@ -30,7 +30,7 @@ export const taterMachine = setup({
     execCmd: function () {},
     resetSpeechCycle: function () {},
     logHeard: ({ event }) =>
-      // DEBUG
+      // DEBUG log heard
       console.log(`>>>>> Heard: ${event.result[0].transcript}`),
   },
   actors: {
