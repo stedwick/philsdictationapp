@@ -1,29 +1,30 @@
-import { useState, useRef } from "react";
+import { useNetworkState } from "@uidotdev/usehooks";
+import { useEffect, useRef } from "react";
+import { Toaster } from "react-hot-toast";
 import "./App.css";
 import { Buttons } from "./components/Buttons";
-import { Toaster } from "react-hot-toast";
-import { useNetworkState } from "@uidotdev/usehooks";
-import { usePhilSpeech } from "./hooks/usePhilSpeech";
+// import { usePhilSpeech } from "./hooks/usePhilSpeech";
 import Indicators from "./components/Indicators";
 import MicErrors from "./components/MicErrors";
+import initializeTater from "./xstate/effects/initialize_tater";
+import subscribeToTater from "./xstate/effects/subscribe_to_tater";
+import { taterMachineContext } from "./xstate/tater_machine_context";
 
 function App() {
-  const [dictationState, setDictationState] = useState<"on" | "off" | "paused">(
-    "off"
-  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const network = useNetworkState();
 
-  const {
-    // transcript,
-    // interimTranscript,
-    // finalTranscript,
-    // resetTranscript,
-    listening,
-    browserSupportsSpeechRecognition,
-    // browserSupportsContinuousListening,
-    isMicrophoneAvailable,
-  } = usePhilSpeech(dictationState, setDictationState, textareaRef);
+  // Fake
+  const [listening, browserSupportsSpeechRecognition, isMicrophoneAvailable] = [
+    false,
+    true,
+    true,
+  ];
+
+  // New XState 'Tater Machine
+  const taterRef = taterMachineContext.useActorRef();
+  useEffect(() => subscribeToTater(taterRef), [taterRef]); // for logging
+  useEffect(() => initializeTater(taterRef), [taterRef]); // init Web Speech API
 
   return (
     <>
@@ -38,6 +39,7 @@ function App() {
 
         <div className="w-full my-4 flex-grow relative">
           <textarea
+            id="taterTextarea"
             placeholder="Click 🎙️ Start Dictating button below..."
             className="textarea textarea-primary textarea-lg w-full h-full"
             ref={textareaRef}
@@ -52,13 +54,7 @@ function App() {
           browserSupportsSpeechRecognition={browserSupportsSpeechRecognition}
         />
 
-        {
-          <Buttons
-            dictationState={dictationState}
-            setDictationState={setDictationState}
-            textareaRef={textareaRef}
-          />
-        }
+        <Buttons />
       </div>
     </>
   );
