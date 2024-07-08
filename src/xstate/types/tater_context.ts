@@ -3,6 +3,7 @@ export type TaterContext = {
   textareaId: string;
   textareaEl: HTMLTextAreaElement;
   textareaCurrentValues: {
+    value: string;
     beforeSelection: string;
     selection: string;
     afterSelection: string;
@@ -12,6 +13,7 @@ export type TaterContext = {
     selection: string | null;
     afterSelection: string | null;
   };
+  micState: "awake" | "asleep" | "off";
   [key: string]: any;
 };
 
@@ -20,6 +22,7 @@ const initialTaterContext: TaterContext = {
   textareaId: "",
   textareaEl: document.createElement("textarea"),
   textareaCurrentValues: {
+    value: "",
     beforeSelection: "",
     selection: "",
     afterSelection: "",
@@ -29,6 +32,7 @@ const initialTaterContext: TaterContext = {
     selection: null,
     afterSelection: null,
   },
+  micState: "off",
 };
 
 export { initialTaterContext };
