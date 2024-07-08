@@ -4,37 +4,38 @@ import { fromPromise } from "xstate";
 export default fromPromise(async function () {
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
-  const SpeechGrammarList =
-    window.SpeechGrammarList || window.webkitSpeechGrammarList;
+  // const SpeechGrammarList =
+  //   window.SpeechGrammarList || window.webkitSpeechGrammarList;
   // const SpeechRecognitionEvent =
   // window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
-  const colors = [
-    "Syncta", // TODO custom words
-    "aqua",
-    "azure",
-    "beige",
-    "bisque",
-    "black",
-    "blue",
-    "brown",
-    "chocolate",
-    "coral" /* … */,
-  ];
-  const grammar = `#JSGF V1.0; grammar colors; public <color> = ${colors.join(
-    " | "
-  )};`;
+  // const colors = [
+  //   "Santa", // TODO custom words
+  //   "aqua",
+  //   "azure",
+  //   "beige",
+  //   "bisque",
+  //   "black",
+  //   "blue",
+  //   "brown",
+  //   "chocolate",
+  //   "coral" /* … */,
+  // ];
+  // const grammar = `#JSGF V1.0; grammar colors; public <color> = ${colors.join(
+  //   " | "
+  // )};`;
 
   const recognition = new SpeechRecognition();
-  const speechRecognitionList = new SpeechGrammarList();
-  speechRecognitionList.addFromString(grammar, 1);
-  recognition.grammars = speechRecognitionList;
+  // const speechRecognitionList = new SpeechGrammarList();
+  // speechRecognitionList.addFromString(grammar, 1);
+  // recognition.grammars = speechRecognitionList;
 
-  // TODO continuous recognition
-  recognition.continuous = false;
+  // TODO auto start & stop on focus
+  recognition.continuous = true;
   recognition.lang = "en-US";
+  // TODO interim results
   recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
+  recognition.maxAlternatives = 5;
 
   return recognition;
 });
