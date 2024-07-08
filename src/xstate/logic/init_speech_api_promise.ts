@@ -10,7 +10,7 @@ export default fromPromise(async function () {
   // window.SpeechRecognitionEvent || window.webkitSpeechRecognitionEvent;
 
   const colors = [
-    "Syncta", // TODO
+    "Syncta", // TODO custom words
     "aqua",
     "azure",
     "beige",
@@ -30,7 +30,7 @@ export default fromPromise(async function () {
   speechRecognitionList.addFromString(grammar, 1);
   recognition.grammars = speechRecognitionList;
 
-  // TODO continuous
+  // TODO continuous recognition
   recognition.continuous = false;
   recognition.lang = "en-US";
   recognition.interimResults = false;
