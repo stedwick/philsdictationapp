@@ -1,6 +1,6 @@
 import { assign, fromPromise, raise, setup } from "xstate";
 import cutText from "./actions/cut_text";
-import { readTextarea, writeTextarea } from "./helpers/textarea";
+import { readTextarea, writeTextarea } from "./actions/textarea";
 import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import speechAPILogic from "./logic/speech_api_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
@@ -176,7 +176,7 @@ export const taterMachine = setup({
                     assign({
                       newText: ({ event }) => event.result[0].transcript,
                     }),
-                    "logHeard",
+                    { type: "logHeard" },
                   ],
                 },
               },
@@ -237,6 +237,7 @@ export const taterMachine = setup({
                 target: "writing",
               },
             },
+            // TODO Handle interim and final results
             writing: {
               entry: [
                 assign({
