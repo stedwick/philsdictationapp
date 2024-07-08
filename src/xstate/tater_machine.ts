@@ -130,9 +130,13 @@ export const taterMachine = setup({
       initial: "off",
       on: {
         cut: {
-          actions: [{ type: "cutText" }],
+          actions: [
+            { type: "cutText" },
+            // navigator.clipboard is asynchronous and does not trigger a textarea change event
+            raise({ type: "textareaInputEvent" }, { delay: 500 }),
+          ],
         },
-        textareaInput: {
+        textareaInputEvent: {
           actions: [
             assign({
               textareaCurrentValues: ({ context }) =>
@@ -259,7 +263,7 @@ export const taterMachine = setup({
                   type: "writeTextarea",
                 },
                 // Setting the value directly does not trigger an input event. Typing and pasting does.
-                raise({ type: "textareaInput" }),
+                raise({ type: "textareaInputEvent" }),
               ],
               always: {
                 target: "saving",
