@@ -13,12 +13,10 @@ const textareaValueSelector = (state: AnyMachineSnapshot) =>
 
 export const Buttons = () => {
   const taterRef = taterMachineContext.useActorRef();
-
   const micState = taterMachineContext.useSelector(micStateSelector);
 
-  // HARD Cut button
-  // const textareaValue = taterMachineContext.useSelector(textareaValueSelector);
-  // const cutEnabled = textareaValue ? "" : "btn-disabled";
+  const textareaValue = taterMachineContext.useSelector(textareaValueSelector);
+  const cutEnabled = textareaValue ? "" : "btn-disabled";
 
   return (
     <div className="flex flex-wrap justify-center lg:justify-between flex-col lg:flex-row gap-x-12 mb-2">
@@ -56,8 +54,7 @@ export const Buttons = () => {
           )}
         </div>
         <button
-          className="btn btn-outline"
-          // TODO Cut action
+          className={"btn btn-outline " + cutEnabled}
           onClick={() => taterRef.send({ type: "cut" })}
         >
           <ScissorsIcon className="h-6 w-6"></ScissorsIcon>Cut
