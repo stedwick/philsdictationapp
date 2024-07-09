@@ -1,10 +1,9 @@
-import { assign, fromPromise, raise, setup, log } from "xstate";
+import { assign, fromPromise, raise, setup } from "xstate";
 import cutText from "./actions/cut_text";
 import { readTextarea, writeTextarea } from "./actions/textarea";
 import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import speechAPILogic from "./logic/speech_api_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
-import punctuate, { addSpacesBetweenSentences } from "../helpers/punctuation";
 import { punctuationMachine } from "./logic/punctuation_machine";
 
 export const taterMachine = setup({
@@ -171,7 +170,7 @@ export const taterMachine = setup({
             },
             awake: {
               entry: assign({ micState: "awake" }),
-              after: { 5000: { target: "asleep" } },
+              after: { 10000: { target: "asleep" } },
               on: {
                 sleep: {
                   target: "asleep",
@@ -246,21 +245,18 @@ export const taterMachine = setup({
                     after: context.textareaCurrentValues.afterSelection
                   }),
                 onDone: {
+                  actions: [
+                    assign({ newText: ({ event }) => event.output }),
+                  ],
                   target: "writing",
                 },
                 onError: {
+                  actions: [
+                    assign({ newText: "" }),
+                  ],
                   target: "writing",
                 },
               },
-              entry: [
-                log("punctuating"),
-                assign({
-                  newText: ({ context }) => punctuate(context.newText!),
-                }),
-                assign({
-                  newText: ({ context: { textareaCurrentValues, newText } }) => addSpacesBetweenSentences({ textareaCurrentValues, newText }),
-                }),
-              ],
             },
             // TODO Handle interim and final results
             writing: {

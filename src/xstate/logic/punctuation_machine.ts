@@ -27,6 +27,10 @@ const charsWithOnlySpaceBefore = "(";
 const charsWithOnlySpaceAfter = ",.:;?!)";
 // const charsWithSpaceBeforeAndAfter = "–";
 
+// TODO space OR beginning of line
+const charsWithOnlySpaceBeforeRegex = new RegExp(`([${charsWithOnlySpaceBefore}])\\s+`, "gi");
+const charsWithOnlySpaceAfterRegex = new RegExp(`\\s+([${charsWithOnlySpaceAfter}])`, "gi");
+
 type PunctuationMachineContext = {
   before: string;
   text: string;
@@ -37,11 +41,13 @@ export const punctuationMachine = setup({
   types: {
     input: {} as PunctuationMachineContext,
     context: {} as PunctuationMachineContext,
+    output: {} as string,
   },
 }).createMachine({
   context: ({ input }) => input,
   id: "Punctuator",
   initial: "punctuating",
+  output: ({ context: { text } }) => text,
   states: {
     punctuating: {
       type: "final",
@@ -50,7 +56,7 @@ export const punctuationMachine = setup({
         assign({
           text: ({ context: { text } }) => text.trim(),
         }),
-        ({ context: { text } }) => console.log(text),
+
         // punctuationRegex
         assign({
           text: ({ context: { text } }) => {
@@ -62,17 +68,33 @@ export const punctuationMachine = setup({
           }
         }),
         ({ context: { text } }) => console.log(text),
+
         // charsWithOnlySpaceBefore
         assign({
           text: ({ context: { text } }) => {
-            return text.replace(new RegExp(`([${charsWithOnlySpaceBefore}])\s+`, "gi"), "$1");
+            return text.replace(charsWithOnlySpaceBeforeRegex, "$1");
           }
         }),
         ({ context: { text } }) => console.log(text),
+
         // charsWithOnlySpaceAfter
         assign({
           text: ({ context: { text } }) => {
-            return text.replace(new RegExp(`\s+([${charsWithOnlySpaceAfter}])`, "gi"), "$1");
+            return text.replace(charsWithOnlySpaceAfterRegex, "$1");
+          }
+        }),
+        ({ context: { text } }) => console.log(text),
+
+        // Special rules
+        assign({
+          text: ({ context: { text } }) => {
+            // These have special spacing rules, and it matters if they are left or right, so we can't use the map above.
+            // Open and close quotes
+            text = text.replace(/open[ -]quotation\s+/gi, '"');
+            text = text.replace(/\s+close[ -]quotation/gi, '"');
+            // Apostrophe s
+            text = text.replace(/\s+apostrophe s/gi, "'s");
+            return text;
           }
         }),
         ({ context: { text } }) => console.log(text),
