@@ -252,7 +252,7 @@ export const taterMachine = setup({
                 },
                 onError: {
                   actions: [
-                    assign({ newText: "" }),
+                    assign({ newText: ({ context }) => context.textareaCurrentValues.selection }),
                   ],
                   target: "writing",
                 },
