@@ -45,6 +45,7 @@ export default function punctuate(str: string) {
     letters.toUpperCase()
   );
   str = str.replace(/^.*?(\w)/gim, "$1");
+  // line
   // str = str.replace(/^.*?(\w)/gim, (_letters, firstWordLetter) =>
   //   firstWordLetter.toUpperCase()
   // );

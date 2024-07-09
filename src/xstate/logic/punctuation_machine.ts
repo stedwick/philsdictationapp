@@ -27,7 +27,7 @@ const charsWithOnlySpaceBefore = "(";
 const charsWithOnlySpaceAfter = ",.:;?!)";
 // const charsWithSpaceBeforeAndAfter = "–";
 
-// TODO space OR beginning of line
+// FIXME space OR beginning of line
 const charsWithOnlySpaceBeforeRegex = new RegExp(`([${charsWithOnlySpaceBefore}])\\s+`, "gi");
 const charsWithOnlySpaceAfterRegex = new RegExp(`\\s+([${charsWithOnlySpaceAfter}])`, "gi");
 
@@ -98,6 +98,10 @@ export const punctuationMachine = setup({
           }
         }),
         ({ context: { text } }) => console.log(text),
+
+        // TODO addSpacesBetweenSentences
+        // TODO capitalize the first letter of each sentence AND line
+        // TODO Special exceptions, a.m. and p.m.
       ],
     },
   },
