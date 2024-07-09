@@ -11,7 +11,7 @@ import { taterMachineContext } from "./xstate/tater_machine_context";
 
 function App() {
   // Fake
-  // TODO Check web speech API support
+  // TODO: Check web speech API support
   const [browserSupportsSpeechRecognition, isMicrophoneAvailable] = [
     true,
     true,

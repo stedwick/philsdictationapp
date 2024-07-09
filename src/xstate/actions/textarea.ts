@@ -23,7 +23,7 @@ function writeTextarea({ textareaNewValues, textareaEl }: WriteParams) {
 
   textareaEl.value = beforeSelection + selection + afterSelection;
 
-  // TODO select interim
+  // TODO: select interim
   // textareaEl.selectionStart = beforeSelection.length + 1;
   textareaEl.selectionStart = beforeSelection.length + selection.length;
   textareaEl.selectionEnd = beforeSelection.length + selection.length;

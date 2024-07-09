@@ -71,7 +71,7 @@ export const Buttons = () => {
         >
           <button className="btn btn-outline btn-secondary">
             <LayoutGridIcon className="h-6 w-6"></LayoutGridIcon>
-            {/* TODO Premium with LemonSqueezy */}
+            {/* TODO: Premium with LemonSqueezy */}
             Premium
           </button>
         </a>

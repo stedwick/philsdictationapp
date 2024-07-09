@@ -31,7 +31,7 @@ export const taterMachine = setup({
     execCmd: function() { },
     resetSpeechCycle: function() { },
     logHeard: ({ event }) =>
-      // DEBUG log heard
+      // DEBUG: log heard
       console.log(`>>>>> Heard: ${event.result[0].transcript}`),
   },
   actors: {
@@ -258,7 +258,7 @@ export const taterMachine = setup({
                 },
               },
             },
-            // TODO Handle interim and final results
+            // TODO: Handle interim and final results
             writing: {
               entry: [
                 assign({

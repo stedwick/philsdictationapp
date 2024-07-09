@@ -1,7 +1,7 @@
 import { assign, setup } from "xstate";
 
 const punctuationMap: Record<string, string> = {
-  // TODO all keyboard punctuation
+  // TODO: all keyboard punctuation
   comma: ",",
   period: ".",
   colon: ":",
@@ -17,7 +17,7 @@ const punctuationMap: Record<string, string> = {
 
 const punctuationRegex = new RegExp(
   Object.keys(punctuationMap).join("|"),
-  // TODO punctuation regex word boundaries
+  // TODO: punctuation regex word boundaries
   // '\b' + Object.keys(punctuationMap).join('\b|\b') + '\b',
   "gi"
 );
@@ -27,7 +27,7 @@ const charsWithOnlySpaceBefore = "(";
 const charsWithOnlySpaceAfter = ",.:;?!)";
 // const charsWithSpaceBeforeAndAfter = "–";
 
-// FIXME space OR beginning of line
+// FIXME: space OR beginning of line
 const charsWithOnlySpaceBeforeRegex = new RegExp(`([${charsWithOnlySpaceBefore}])\\s+`, "gi");
 const charsWithOnlySpaceAfterRegex = new RegExp(`\\s+([${charsWithOnlySpaceAfter}])`, "gi");
 
@@ -99,9 +99,9 @@ export const punctuationMachine = setup({
         }),
         ({ context: { text } }) => console.log(text),
 
-        // TODO addSpacesBetweenSentences
-        // TODO capitalize the first letter of each sentence AND line
-        // TODO Special exceptions, a.m. and p.m.
+        // TODO: addSpacesBetweenSentences
+        // TODO: capitalize the first letter of each sentence AND line
+        // TODO: Special exceptions, a.m. and p.m.
       ],
     },
   },
