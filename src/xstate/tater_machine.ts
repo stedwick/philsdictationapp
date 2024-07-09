@@ -1,9 +1,11 @@
-import { assign, fromPromise, raise, setup } from "xstate";
+import { assign, fromPromise, raise, setup, log } from "xstate";
 import cutText from "./actions/cut_text";
 import { readTextarea, writeTextarea } from "./actions/textarea";
 import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import speechAPILogic from "./logic/speech_api_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
+import punctuate, { addSpacesBetweenSentences } from "../helpers/punctuation";
+import { punctuationMachine } from "./logic/punctuation_machine";
 
 export const taterMachine = setup({
   types: {
@@ -13,9 +15,9 @@ export const taterMachine = setup({
     context: {} as TaterContext,
   },
   actions: {
-    saveText: function () {},
-    loadSavedText: () => {},
-    punctuateText: function () {},
+    saveText: function() { },
+    loadSavedText: () => { },
+    punctuateText: function() { },
     writeTextarea: ({ context: { textareaNewValues, textareaEl } }) =>
       writeTextarea({
         textareaNewValues,
@@ -24,11 +26,11 @@ export const taterMachine = setup({
     cutText: ({ context: { textareaEl } }) => cutText(textareaEl),
     turnMicOn: ({ context: { recognition } }) => recognition!.start(),
     turnMicOff: ({ context: { recognition } }) => recognition!.stop(),
-    checkSpeechResult: function () {},
-    checkForVoiceCommand: function () {},
-    setVoiceCommand: function () {},
-    execCmd: function () {},
-    resetSpeechCycle: function () {},
+    checkSpeechResult: function() { },
+    checkForVoiceCommand: function() { },
+    setVoiceCommand: function() { },
+    execCmd: function() { },
+    resetSpeechCycle: function() { },
     logHeard: ({ event }) =>
       // DEBUG log heard
       console.log(`>>>>> Heard: ${event.result[0].transcript}`),
@@ -36,31 +38,32 @@ export const taterMachine = setup({
   actors: {
     initSpeechAPI: initSpeechAPILogic,
     speechAPI: speechAPILogic,
-    voiceCommandMachine: fromPromise(async function () {}),
+    voiceCommandMachine: fromPromise(async function() { }),
+    punctuationMachine: punctuationMachine
   },
   guards: {
-    isAwake: function () {
+    isAwake: function() {
       return true;
     },
-    isAsleep: function () {
+    isAsleep: function() {
       return true;
     },
-    isInterimResult: function () {
+    isInterimResult: function() {
+      return false;
+    },
+    isFinalResult: function() {
       return true;
     },
-    isFinalResult: function () {
+    isText: function() {
       return true;
     },
-    isText: function () {
+    isCommand: function() {
+      return false;
+    },
+    isWakeCommand: function() {
       return true;
     },
-    isCommand: function () {
-      return true;
-    },
-    isWakeCommand: function () {
-      return true;
-    },
-    isSleepCommand: function () {
+    isSleepCommand: function() {
       return true;
     },
   },
@@ -160,6 +163,9 @@ export const taterMachine = setup({
                 },
                 hear: {
                   target: "hearingWhileAsleep",
+                  actions: [
+                    { type: "logHeard" },
+                  ]
                 },
               },
             },
@@ -173,9 +179,10 @@ export const taterMachine = setup({
                 hear: {
                   target: "hearing",
                   actions: [
-                    assign({
-                      newText: ({ event }) => event.result[0].transcript,
-                    }),
+                    assign(({ event }) => ({
+                      newResult: event.result[0],
+                      newText: event.result[0].transcript,
+                    })),
                     { type: "logHeard" },
                   ],
                 },
@@ -230,12 +237,30 @@ export const taterMachine = setup({
               },
             },
             punctuating: {
-              entry: {
-                type: "punctuateText",
+              invoke: {
+                src: "punctuationMachine",
+                input: ({ context }) => (
+                  {
+                    before: context.textareaCurrentValues.beforeSelection,
+                    text: context.newText || "",
+                    after: context.textareaCurrentValues.afterSelection
+                  }),
+                onDone: {
+                  target: "writing",
+                },
+                onError: {
+                  target: "writing",
+                },
               },
-              always: {
-                target: "writing",
-              },
+              entry: [
+                log("punctuating"),
+                assign({
+                  newText: ({ context }) => punctuate(context.newText!),
+                }),
+                assign({
+                  newText: ({ context: { textareaCurrentValues, newText } }) => addSpacesBetweenSentences({ textareaCurrentValues, newText }),
+                }),
+              ],
             },
             // TODO Handle interim and final results
             writing: {
@@ -245,7 +270,7 @@ export const taterMachine = setup({
                     beforeSelection: null,
                     selection: context.newText,
                     afterSelection: null,
-                  }),
+                  })
                 }),
                 {
                   type: "writeTextarea",
@@ -265,7 +290,11 @@ export const taterMachine = setup({
                 target: "awake",
               },
             },
-            hearingWhileAsleep: {},
+            hearingWhileAsleep: {
+              always: {
+                target: "asleep",
+              },
+            },
           },
         },
       },

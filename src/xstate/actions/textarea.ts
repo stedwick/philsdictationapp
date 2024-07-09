@@ -21,12 +21,12 @@ function writeTextarea({ textareaNewValues, textareaEl }: WriteParams) {
   const afterSelection =
     textareaNewValues.afterSelection || currentValues.afterSelection;
 
-  // TODO add spacing correctly
-  textareaEl.value = beforeSelection + " " + selection + " " + afterSelection;
+  textareaEl.value = beforeSelection + selection + afterSelection;
 
+  // TODO select interim
   // textareaEl.selectionStart = beforeSelection.length + 1;
-  textareaEl.selectionStart = beforeSelection.length + selection.length + 1;
-  textareaEl.selectionEnd = beforeSelection.length + selection.length + 1;
+  textareaEl.selectionStart = beforeSelection.length + selection.length;
+  textareaEl.selectionEnd = beforeSelection.length + selection.length;
 }
 
 export { readTextarea, writeTextarea };
