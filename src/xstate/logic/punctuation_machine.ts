@@ -17,12 +17,12 @@ const punctuationMap: Record<string, string> = {
 
 const punctuationRegex = new RegExp(
   Object.keys(punctuationMap).join("|"),
-  // TODO: punctuation regex word boundaries
+  // FIXME: punctuation regex word boundaries
   // '\b' + Object.keys(punctuationMap).join('\b|\b') + '\b',
   "gi"
 );
 
-// const charsWithNoSpaces = "-";
+const charsWithNoSpaces = "-";
 const charsWithOnlySpaceBefore = "(";
 const charsWithOnlySpaceAfter = ",.:;?!)";
 // const charsWithSpaceBeforeAndAfter = "–";
@@ -30,6 +30,10 @@ const charsWithOnlySpaceAfter = ",.:;?!)";
 // FIXME: space OR beginning of line
 const charsWithOnlySpaceBeforeRegex = new RegExp(`([${charsWithOnlySpaceBefore}])\\s+`, "gi");
 const charsWithOnlySpaceAfterRegex = new RegExp(`\\s+([${charsWithOnlySpaceAfter}])`, "gi");
+
+const capitalizeNextRegex = /[.!?]?$/;
+const spaceComesNextRegex = new RegExp(`^[^\s${charsWithOnlySpaceAfter}${charsWithNoSpaces}]`);
+const spaceComesBeforeRegex = new RegExp(`^[^${charsWithOnlySpaceAfter}]`);
 
 type PunctuationMachineContext = {
   before: string;
@@ -67,7 +71,7 @@ export const punctuationMachine = setup({
             });
           }
         }),
-        ({ context: { text } }) => console.log(text),
+        ({ context: { text } }) => console.log("punc: [", text, "]"),
 
         // charsWithOnlySpaceBefore
         assign({
@@ -75,7 +79,7 @@ export const punctuationMachine = setup({
             return text.replace(charsWithOnlySpaceBeforeRegex, "$1");
           }
         }),
-        ({ context: { text } }) => console.log(text),
+        ({ context: { text } }) => console.log("<space: [", text, "]"),
 
         // charsWithOnlySpaceAfter
         assign({
@@ -83,7 +87,7 @@ export const punctuationMachine = setup({
             return text.replace(charsWithOnlySpaceAfterRegex, "$1");
           }
         }),
-        ({ context: { text } }) => console.log(text),
+        ({ context: { text } }) => console.log("space> [", text, "]"),
 
         // Special rules
         assign({
@@ -97,11 +101,55 @@ export const punctuationMachine = setup({
             return text;
           }
         }),
-        ({ context: { text } }) => console.log(text),
+        ({ context: { text } }) => console.log("special's: [", text, "]"),
 
-        // TODO: addSpacesBetweenSentences
+        // Capitalize the first letter of each sentence
+        assign({
+          text: ({ context: { before, text } }) => {
+            if (before.match(capitalizeNextRegex)) {
+              return text.replace(/^(.)/, (char) => char.toUpperCase());
+            } else {
+              return text;
+            }
+          }
+        }),
+        ({ context: { text } }) => console.log("cap 1st: [", text, "]"),
+
+        // Capitalize within utterance (saying two sentences with a period in one breath)
+        assign({
+          text: ({ context: { text } }) => {
+            return text.replace(/([.?!]\s+)(\w)/g, (_match, p1, p2) => (p1 + p2.toUpperCase()));
+          }
+        }),
+        ({ context: { text } }) => console.log("cap . cap: [", text, "]"),
+
+        // Add space before sentence
+        assign({
+          text: ({ context: { before, text } }) => {
+            if (before.match(spaceComesNextRegex)) {
+              return " " + text;
+            } else {
+              return text;
+            }
+          }
+        }),
+        ({ context: { text } }) => console.log("space .: [", text, "]"),
+
+        // Add space after sentence
+        assign({
+          text: ({ context: { text, after } }) => {
+            if (after.match(spaceComesBeforeRegex)) {
+              return text + " ";
+            } else {
+              return text;
+            }
+          }
+        }),
+        ({ context: { text } }) => console.log(". space: [", text, "]"),
+
         // TODO: capitalize the first letter of each sentence AND line
         // TODO: Special exceptions, a.m. and p.m.
+        // FIXME: punc edge cases
       ],
     },
   },

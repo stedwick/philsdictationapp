@@ -13,7 +13,7 @@ export const textareaOnChange = ({ textareaRef, taterRef }: params) => {
     (event) => {
       textareaRef.current?.addEventListener(event, () => {
         timeoutId && clearTimeout(timeoutId);
-        timeoutId = setTimeout(function () {
+        timeoutId = setTimeout(function() {
           taterRef.send({ type: "textareaInputEvent" });
         }, debounceRate);
       });

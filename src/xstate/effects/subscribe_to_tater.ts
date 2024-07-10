@@ -7,7 +7,7 @@ export default function subscribeToTater(taterRef: AnyActorRef) {
 
     const subscription = taterRef.subscribe((snapshot) => {
       timeoutId && clearTimeout(timeoutId);
-      timeoutId = setTimeout(function () {
+      timeoutId = setTimeout(function() {
         console.log(snapshot);
       }, debounceRate);
     });

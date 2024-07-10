@@ -122,7 +122,8 @@ export const taterMachine = setup({
           actions: [
             { type: "cutText" },
             // navigator.clipboard is asynchronous and does not trigger a textarea change event
-            raise({ type: "textareaInputEvent" }, { delay: 500 }),
+            raise({ type: "textareaInputEvent" }, { delay: 250 }),
+            raise({ type: "sleep" }, { delay: 250 }),
           ],
         },
         textareaInputEvent: {
@@ -169,7 +170,10 @@ export const taterMachine = setup({
               },
             },
             awake: {
-              entry: assign({ micState: "awake" }),
+              entry: [
+                assign({ micState: "awake" }),
+                ({ context: { textareaEl } }) => textareaEl.focus(),
+              ],
               after: { 10000: { target: "asleep" } },
               on: {
                 sleep: {
