@@ -121,7 +121,7 @@ export const punctuationMachine = setup({
             return text.replace(/([.?!]\s+)(\w)/g, (_match, p1, p2) => (p1 + p2.toUpperCase()));
           }
         }),
-        ({ context: { text } }) => console.log("cap . cap: [", text, "]"),
+        ({ context: { text } }) => console.log("end. cap: [", text, "]"),
 
         // Add space before sentence
         assign({

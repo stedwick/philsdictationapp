@@ -16,7 +16,6 @@ const punctuationRegex = new RegExp(
   "gi"
 );
 
-// TODO: add spacing correctly
 export default function punctuate(str: string) {
   // trim whitespace
   str = str.trim();
