@@ -7,7 +7,7 @@ const punctuationMap: Record<string, string> = {
   colon: ":",
   semicolon: ";",
   hyphen: "-",
-  // dash: "–",
+  // "en dash": "–",
   "question mark": "?",
   "exclamation mark": "!",
   "open parentheses": "(",
@@ -16,29 +16,33 @@ const punctuationMap: Record<string, string> = {
 };
 
 const punctuationRegex = new RegExp(
-  Object.keys(punctuationMap).join("|"),
-  // FIXME: punctuation regex word boundaries
-  // '\b' + Object.keys(punctuationMap).join('\b|\b') + '\b',
+  // Why does \b have to be escaped inside single quotes?
+  '\\b(' + Object.keys(punctuationMap).join('|') + ')\\b',
   "gi"
 );
 
 const charsWithNoSpaces = "-";
 const charsWithOnlySpaceBefore = "(";
 const charsWithOnlySpaceAfter = ",.:;?!)";
+const charsThatCapitalizeNext = ".?!\\\n";
 // const charsWithSpaceBeforeAndAfter = "–";
 
 // FIXME: space OR beginning of line
-const charsWithOnlySpaceBeforeRegex = new RegExp(`([${charsWithOnlySpaceBefore}])\\s+`, "gi");
-const charsWithOnlySpaceAfterRegex = new RegExp(`\\s+([${charsWithOnlySpaceAfter}])`, "gi");
+const charsWithOnlySpaceBeforeRegex = new RegExp(`([${charsWithOnlySpaceBefore}])\\s+`, "g");
+const charsWithOnlySpaceAfterRegex = new RegExp(`\\s+([${charsWithOnlySpaceAfter}])`, "g");
+const charsThatCapitalizeNextRegex = new RegExp(`([${charsThatCapitalizeNext}]\\s+)(\\w)`, "g");
 
-const capitalizeNextRegex = /[.!?]?$/;
-const spaceComesNextRegex = new RegExp(`^[^\s${charsWithOnlySpaceAfter}${charsWithNoSpaces}]`);
+const capitalizeNextRegex = new RegExp(`(^|[${charsThatCapitalizeNext}])\\s*$`);
+window.regex = capitalizeNextRegex;
+const spaceComesNextRegex = new RegExp(`[^\\s${charsWithOnlySpaceBefore}${charsWithNoSpaces}]$`);
 const spaceComesBeforeRegex = new RegExp(`^[^${charsWithOnlySpaceAfter}]`);
 
 type PunctuationMachineContext = {
   before: string;
   text: string;
   after: string;
+  // numCharsPaddedBefore?: number;
+  // numCharsPaddedAfter?: number;
 }
 
 export const punctuationMachine = setup({
@@ -73,22 +77,6 @@ export const punctuationMachine = setup({
         }),
         ({ context: { text } }) => console.log("punc: [", text, "]"),
 
-        // charsWithOnlySpaceBefore
-        assign({
-          text: ({ context: { text } }) => {
-            return text.replace(charsWithOnlySpaceBeforeRegex, "$1");
-          }
-        }),
-        ({ context: { text } }) => console.log("<space: [", text, "]"),
-
-        // charsWithOnlySpaceAfter
-        assign({
-          text: ({ context: { text } }) => {
-            return text.replace(charsWithOnlySpaceAfterRegex, "$1");
-          }
-        }),
-        ({ context: { text } }) => console.log("space> [", text, "]"),
-
         // Special rules
         assign({
           text: ({ context: { text } }) => {
@@ -102,6 +90,22 @@ export const punctuationMachine = setup({
           }
         }),
         ({ context: { text } }) => console.log("special's: [", text, "]"),
+
+        // Is padding a problem?
+        // Pad text with the last/first non-space characters from before and after.
+        // This affects punctuation, for example:
+        // "...end." + text + "(and..."
+        //
+        // assign(({ context: { before, text, after } }) => {
+        //   const padBefore = before.match(/[^\s]*\s*$/)?.[0] || "";
+        //   const padAfter = after.match(/^\s*[^\s]*/)?.[0] || "";
+        //   return {
+        //     text: padBefore + text + padAfter,
+        //     numCharsPaddedBefore: padBefore.length,
+        //     numCharsPaddedAfter: padAfter.length,
+        //   };
+        // }),
+        // ({ context: { text } }) => console.log("<pad>: [", text, "]"),
 
         // Capitalize the first letter of each sentence
         assign({
@@ -118,7 +122,7 @@ export const punctuationMachine = setup({
         // Capitalize within utterance (saying two sentences with a period in one breath)
         assign({
           text: ({ context: { text } }) => {
-            return text.replace(/([.?!]\s+)(\w)/g, (_match, p1, p2) => (p1 + p2.toUpperCase()));
+            return text.replace(charsThatCapitalizeNextRegex, (_match, p1, p2) => (p1 + p2.toUpperCase()));
           }
         }),
         ({ context: { text } }) => console.log("end. cap: [", text, "]"),
@@ -146,6 +150,31 @@ export const punctuationMachine = setup({
           }
         }),
         ({ context: { text } }) => console.log(". space: [", text, "]"),
+
+        // charsWithOnlySpaceBefore
+        assign({
+          text: ({ context: { text } }) => {
+            return text.replace(charsWithOnlySpaceBeforeRegex, "$1");
+          }
+        }),
+        ({ context: { text } }) => console.log("<space: [", text, "]"),
+
+        // charsWithOnlySpaceAfter
+        assign({
+          text: ({ context: { text } }) => {
+            return text.replace(charsWithOnlySpaceAfterRegex, "$1");
+          }
+        }),
+        ({ context: { text } }) => console.log("space> [", text, "]"),
+
+        // Trim multi-line
+        assign({
+          text: ({ context: { text } }) => {
+            // We have to trim spaces but not include new lines in \s
+            return text.replace(/[^\S\n]*(\n+)[^\S\n]*/g, "$1");
+          }
+        }),
+        ({ context: { text } }) => console.log("_trim_ [", text, "]"),
 
         // TODO: capitalize the first letter of each sentence AND line
         // TODO: Special exceptions, a.m. and p.m.
