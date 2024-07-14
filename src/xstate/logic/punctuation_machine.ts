@@ -69,6 +69,16 @@ export const punctuationMachine = setup({
           text: ({ context: { text } }) => text.trim(),
         }),
 
+        // Preserve special cases
+        assign({
+          text: ({ context: { text } }) => {
+            text = text.replace(/a\.m\./g, "xxAAMMxx");
+            text = text.replace(/a\.m\./g, "xxPPMMxx");
+            return text;
+          },
+        }),
+        ({ context: { text } }) => console.log("A.M.P.M.: [", text, "]"),
+
         // Add space before sentence
         assign({
           text: ({ context: { before, text } }) => {
@@ -164,7 +174,16 @@ export const punctuationMachine = setup({
         }),
         ({ context: { text } }) => console.log("_trim_ [", text, "]"),
 
-        // TODO: capitalize the first letter of each sentence AND line
+        // Put back special cases
+        assign({
+          text: ({ context: { text } }) => {
+            text = text.replace(/xxAAMMxx/g, "a.m.");
+            text = text.replace(/xxPPMMxx/g, "p.m.");
+            return text;
+          },
+        }),
+        ({ context: { text } }) => console.log("a.m.p.m.: [", text, "]"),
+
         // TODO: Special exceptions, a.m. and p.m.
         // FIXME: punc edge cases
       ],
