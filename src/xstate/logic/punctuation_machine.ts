@@ -113,7 +113,7 @@ export const punctuationMachine = setup({
       type: "final",
       // The order below is very important.
       // Fun sentence to test with from Claude AI:
-      // "Wow! Can you believe it?! The package ($49.99 + taxes) arrived @ 3:30 p.m. - but it was empty... #disappointed :("
+      // "Wow! Can you believe it?! The package ($49.99 + taxes) arrived at 3:30 p.m. - but it was empty... #disappointed :( Email me at philip@gmail.com"
       entry: [
         // trim
         assign({
