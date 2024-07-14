@@ -109,7 +109,6 @@ export const taterMachine = setup({
         onError: { target: "errored" },
       },
     },
-    // TODO: Handle error state
     errored: {
       type: "final"
     },
