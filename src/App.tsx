@@ -3,23 +3,18 @@ import { Toaster } from "react-hot-toast";
 import "./App.css";
 import { Buttons } from "./components/Buttons";
 import Indicators from "./components/Indicators";
-import MicErrors from "./components/MicErrors";
 import initializeTater from "./xstate/effects/initialize_tater";
 import subscribeToTater from "./xstate/effects/subscribe_to_tater";
 import { textareaOnChange } from "./xstate/helpers/textarea_onchange";
 import { taterMachineContext } from "./xstate/tater_machine_context";
+import TaterFatal from "./components/errors/tater_fatal";
 
 function App() {
-  // Fake
-  // TODO: Check web speech API support
-  const [browserSupportsSpeechRecognition, isMicrophoneAvailable] = [
-    true,
-    true,
-  ];
-
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
   // New XState 'Tater Machine
   const taterRef = taterMachineContext.useActorRef();
+  const taterFatal = taterMachineContext.useSelector((state) => state.matches("errored"));
 
   useEffect(() => subscribeToTater(taterRef), [taterRef]); // for logging
   useEffect(() => initializeTater(taterRef), [taterRef]); // init Web Speech API
@@ -32,7 +27,6 @@ function App() {
   return (
     <>
       <Toaster />
-
       <div
         className="container mx-auto px-4 py-4 flex flex-col"
         style={{ height: "100dvh" }}
@@ -55,10 +49,7 @@ function App() {
           </div>
         </div>
 
-        <MicErrors
-          isMicrophoneAvailable={isMicrophoneAvailable}
-          browserSupportsSpeechRecognition={browserSupportsSpeechRecognition}
-        />
+        {taterFatal && <TaterFatal />}
 
         <Buttons />
       </div>
