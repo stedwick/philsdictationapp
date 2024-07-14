@@ -263,6 +263,7 @@ export const taterMachine = setup({
               },
             },
             // TODO: Handle interim and final results
+            // TODO: Scroll into view
             writing: {
               entry: [
                 assign({
