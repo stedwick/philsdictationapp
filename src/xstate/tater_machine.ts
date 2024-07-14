@@ -7,6 +7,7 @@ import { punctuationMachine } from "./logic/punctuation_machine";
 import speechAPILogic from "./logic/speech_api_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
 import { aTextareaCurrentValues } from "./assigns/textarea";
+import { loadSavedText, saveText } from "./actions/save_and_load";
 
 const debugLog = import.meta.env.VITE_DEBUG === "true";
 
@@ -18,9 +19,9 @@ export const taterMachine = setup({
     context: {} as TaterContext,
   },
   actions: {
-    // TODO: save & load
-    saveText: function() { },
-    loadSavedText: () => { },
+    focus: ({ context: { textareaEl } }) => textareaEl.focus(),
+    saveText,
+    loadSavedText,
     writeTextarea: ({ context: { textareaNewValues, textareaEl } }) => writeTextarea({
       textareaNewValues, textareaEl,
     }),
@@ -85,6 +86,7 @@ export const taterMachine = setup({
     initializing: {
       entry: [
         { type: "loadSavedText" },
+        { type: "focus" },
         assign(aTextareaCurrentValues),
       ],
       invoke: {
@@ -122,7 +124,12 @@ export const taterMachine = setup({
             raise({ type: "sleep" }, { delay: 250 }),
           ],
         },
-        textareaInputEvent: { actions: assign(aTextareaCurrentValues) },
+        textareaInputEvent: {
+          actions: [
+            assign(aTextareaCurrentValues),
+            { type: "saveText" }
+          ]
+        },
       },
       states: {
         off: { on: { turnOn: { target: "on" } } },
@@ -145,7 +152,7 @@ export const taterMachine = setup({
             awake: {
               entry: [
                 assign({ micState: "awake" }),
-                ({ context: { textareaEl } }) => textareaEl.focus(),
+                { type: "focus" }
               ],
               after: { 10000: { target: "asleep" } },
               on: {
