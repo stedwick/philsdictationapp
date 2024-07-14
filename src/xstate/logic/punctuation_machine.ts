@@ -87,7 +87,7 @@ const spaceComesNextRegex = new RegExp(`[^\\s${charsWithOnlySpaceBefore}${charsW
 const spaceComesBeforeRegex = new RegExp(`^[^${charsWithOnlySpaceAfter}]`);
 // window.regex = capitalizeNextRegex;
 
-const debugLog = import.meta.env.VITE_DEBUG === "true";
+const debugLog = false; // import.meta.env.VITE_DEBUG === "true";
 
 type PunctuationMachineContext = {
   before: string;
@@ -262,7 +262,7 @@ export const punctuationMachine = setup({
             return text.replace(/[^\S\n]*(\n+)[^\S\n]*/g, "$1");
           }
         }),
-        ({ context: { text } }) => console.log("_trim_ [", text, "]"),
+        ({ context: { text } }) => debugLog && console.log("_trim_ [", text, "]"),
 
         // MAYBE: SUPER edge cases, not worrying about these for now
         // 3:30 p.m. -But it was tomorrow

@@ -1,10 +1,14 @@
 import { assign, fromPromise, raise, setup } from "xstate";
 import cutText from "./actions/cut_text";
-import { readTextarea, writeTextarea } from "./actions/textarea";
+import { writeTextarea } from "./actions/textarea";
+import { aTextareaEl } from "./assigns/init";
 import initSpeechAPILogic from "./logic/init_speech_api_promise";
+import { punctuationMachine } from "./logic/punctuation_machine";
 import speechAPILogic from "./logic/speech_api_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
-import { punctuationMachine } from "./logic/punctuation_machine";
+import { aTextareaCurrentValues } from "./assigns/textarea";
+
+const debugLog = import.meta.env.VITE_DEBUG === "true";
 
 export const taterMachine = setup({
   types: {
@@ -14,14 +18,12 @@ export const taterMachine = setup({
     context: {} as TaterContext,
   },
   actions: {
+    // TODO: save & load
     saveText: function() { },
     loadSavedText: () => { },
-    punctuateText: function() { },
-    writeTextarea: ({ context: { textareaNewValues, textareaEl } }) =>
-      writeTextarea({
-        textareaNewValues,
-        textareaEl,
-      }),
+    writeTextarea: ({ context: { textareaNewValues, textareaEl } }) => writeTextarea({
+      textareaNewValues, textareaEl,
+    }),
     cutText: ({ context: { textareaEl } }) => cutText(textareaEl),
     turnMicOn: ({ context: { recognition } }) => recognition!.start(),
     turnMicOff: ({ context: { recognition } }) => recognition!.stop(),
@@ -30,15 +32,13 @@ export const taterMachine = setup({
     setVoiceCommand: function() { },
     execCmd: function() { },
     resetSpeechCycle: function() { },
-    logHeard: ({ event }) =>
-      // DEBUG: log heard
-      console.log(`>>>>> Heard: ${event.result[0].transcript}`),
+    logHeard: ({ event }) => debugLog && console.log(`>>>>> Heard: ${event.result[0].transcript}`),
   },
   actors: {
     initSpeechAPI: initSpeechAPILogic,
     speechAPI: speechAPILogic,
+    punctuationMachine: punctuationMachine,
     voiceCommandMachine: fromPromise(async function() { }),
-    punctuationMachine: punctuationMachine
   },
   guards: {
     isAwake: function() {
@@ -77,29 +77,23 @@ export const taterMachine = setup({
     uninitialized: {
       on: {
         initialize: {
+          actions: assign(aTextareaEl),
           target: "initializing",
-          actions: assign({
-            textareaEl: ({ context }) =>
-              document.getElementById(
-                context.textareaId!
-              ) as HTMLTextAreaElement,
-          }),
         },
       },
     },
     initializing: {
-      entry: [{ type: "loadSavedText" }],
+      entry: [
+        { type: "loadSavedText" },
+        assign(aTextareaCurrentValues),
+      ],
       invoke: {
         src: "initSpeechAPI",
         onDone: {
-          target: "initialized",
           actions: [
+            assign({ recognition: ({ event }) => event.output }),
             assign({
-              recognition: ({ event }) => event.output,
-            }),
-            assign({
-              speechApi: (params) => {
-                const { context, spawn } = params;
+              speechApi: ({ context, spawn }) => {
                 const recognition = context.recognition!;
                 return spawn("speechAPI", {
                   id: "speechAPIMachine",
@@ -108,12 +102,14 @@ export const taterMachine = setup({
               },
             }),
           ],
+          target: "initialized",
         },
         onError: { target: "errored" },
       },
     },
+    // TODO: Handle error state
     errored: {
-      type: "final",
+      type: "final"
     },
     initialized: {
       initial: "off",
@@ -126,46 +122,23 @@ export const taterMachine = setup({
             raise({ type: "sleep" }, { delay: 250 }),
           ],
         },
-        textareaInputEvent: {
-          actions: [
-            assign({
-              textareaCurrentValues: ({ context }) =>
-                readTextarea(context.textareaEl),
-            }),
-          ],
-        },
+        textareaInputEvent: { actions: assign(aTextareaCurrentValues) },
       },
       states: {
-        off: {
-          on: {
-            turnOn: {
-              target: "on",
-            },
-          },
-        },
+        off: { on: { turnOn: { target: "on" } } },
         on: {
           initial: "awake",
-          entry: {
-            type: "turnMicOn",
-          },
+          entry: { type: "turnMicOn" },
           exit: [{ type: "turnMicOff" }, assign({ micState: "off" })],
-          on: {
-            turnOff: {
-              target: "off",
-            },
-          },
+          on: { turnOff: { target: "off" } },
           states: {
             asleep: {
               entry: assign({ micState: "asleep" }),
               on: {
-                wake: {
-                  target: "awake",
-                },
+                wake: { target: "awake", },
                 hear: {
                   target: "hearingWhileAsleep",
-                  actions: [
-                    { type: "logHeard" },
-                  ]
+                  actions: { type: "logHeard" }
                 },
               },
             },
@@ -176,9 +149,7 @@ export const taterMachine = setup({
               ],
               after: { 10000: { target: "asleep" } },
               on: {
-                sleep: {
-                  target: "asleep",
-                },
+                sleep: { target: "asleep" },
                 hear: {
                   target: "hearing",
                   actions: [
@@ -192,12 +163,6 @@ export const taterMachine = setup({
               },
             },
             hearing: {
-              entry: [
-                { type: "resetSpeechCycle" },
-                {
-                  type: "checkSpeechResult",
-                },
-              ],
               always: [
                 {
                   target: "writing",
@@ -214,9 +179,6 @@ export const taterMachine = setup({
               ],
             },
             interpreting: {
-              entry: {
-                type: "checkForVoiceCommand",
-              },
               always: [
                 {
                   target: "runningVoiceCommand",
@@ -242,22 +204,21 @@ export const taterMachine = setup({
             punctuating: {
               invoke: {
                 src: "punctuationMachine",
-                input: ({ context }) => (
+                input: ({ context: { textareaCurrentValues, newText } }) => (
                   {
-                    before: context.textareaCurrentValues.beforeSelection,
-                    text: context.newText || "",
-                    after: context.textareaCurrentValues.afterSelection
+                    before: textareaCurrentValues.beforeSelection,
+                    text: newText || "",
+                    after: textareaCurrentValues.afterSelection
                   }),
                 onDone: {
                   actions: [
                     assign({ newText: ({ event }) => event.output }),
+                    ({ event }) => debugLog && console.log("punctuated: [", event.output, "]"),
                   ],
                   target: "writing",
                 },
                 onError: {
-                  actions: [
-                    assign({ newText: ({ context }) => context.newText || "" }),
-                  ],
+                  actions: assign({ newText: ({ context }) => context.newText || "" }),
                   target: "writing",
                 },
               },
@@ -268,33 +229,23 @@ export const taterMachine = setup({
               entry: [
                 assign({
                   textareaNewValues: ({ context }) => ({
-                    beforeSelection: null,
+                    beforeSelection: null, // TODO: selection
                     selection: context.newText,
                     afterSelection: null,
                   })
                 }),
-                {
-                  type: "writeTextarea",
-                },
+                { type: "writeTextarea" },
                 // Setting the value directly does not trigger an input event. Typing and pasting does.
                 raise({ type: "textareaInputEvent" }),
               ],
-              always: {
-                target: "saving",
-              },
+              always: { target: "saving" },
             },
             saving: {
-              entry: {
-                type: "saveText",
-              },
-              always: {
-                target: "awake",
-              },
+              entry: { type: "saveText" },
+              always: { target: "awake" },
             },
             hearingWhileAsleep: {
-              always: {
-                target: "asleep",
-              },
+              always: { target: "asleep" },
             },
           },
         },

@@ -24,6 +24,7 @@ function App() {
   useEffect(() => subscribeToTater(taterRef), [taterRef]); // for logging
   useEffect(() => initializeTater(taterRef), [taterRef]); // init Web Speech API
   useEffect(
+    // TODO: Move to speech callback machine
     () => textareaOnChange({ textareaRef, taterRef }),
     [textareaRef, taterRef]
   );
