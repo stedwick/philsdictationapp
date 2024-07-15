@@ -20,6 +20,7 @@ export type TaterContext = {
   micState: "awake" | "asleep" | "off";
   speechApiActor?: AnyActorRef | null;
   textareaActor?: AnyActorRef | null;
+  windowActor?: AnyActorRef | null;
   [key: string]: any;
 };
 

@@ -30,7 +30,6 @@ export default fromPromise(async function() {
   // speechRecognitionList.addFromString(grammar, 1);
   // recognition.grammars = speechRecognitionList;
 
-  // TODO: auto start & stop on focus
   recognition.continuous = true;
   recognition.lang = "en-US";
   recognition.interimResults = true;

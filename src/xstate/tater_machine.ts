@@ -6,6 +6,7 @@ import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import { punctuationMachine } from "./logic/punctuation_machine";
 import speechAPILogic from "./logic/speech_api_callback";
 import textareaLogic from "./logic/textarea_callback";
+import windowLogic from "./logic/window_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
 import { aTextareaCurrentValues } from "./assigns/textarea";
 import { loadSavedText, saveText } from "./actions/save_and_load";
@@ -39,6 +40,7 @@ export const taterMachine = setup({
     initSpeechAPILogic,
     speechAPILogic,
     textareaLogic,
+    windowLogic,
     punctuationMachine,
     voiceCommandMachine: fromPromise(async function() { }),
   },
@@ -105,6 +107,7 @@ export const taterMachine = setup({
                   input: { textareaEl },
                 });
               },
+              windowActor: ({ spawn }) => spawn("windowLogic", { id: "windowMachine", }),
             }),
           ],
           target: "initialized",
@@ -134,17 +137,26 @@ export const taterMachine = setup({
         },
       },
       states: {
-        off: { on: { turnOn: { target: "on" } } },
+        off: {
+          on: {
+            turnOn: { target: "on" },
+            autoOn: { target: "on" }
+          }
+        },
         on: {
           initial: "awake",
           entry: { type: "turnMicOn" },
           exit: [{ type: "turnMicOff" }, assign({ micState: "off" })],
-          on: { turnOff: { target: "off" } },
+          on: {
+            turnOff: { target: "off" },
+            autoOff: { target: "off" }
+          },
           states: {
             asleep: {
               entry: assign({ micState: "asleep" }),
               on: {
                 wake: { target: "awake", },
+                autoOn: { target: "awake", },
                 hear: {
                   target: "hearingWhileAsleep",
                   actions: { type: "logHeard" }
@@ -269,6 +281,7 @@ export const taterMachine = setup({
               entry: { type: "saveText" },
               always: { target: "awake" },
             },
+            // TODO: Wake up command
             hearingWhileAsleep: {
               always: { target: "asleep" },
             },
