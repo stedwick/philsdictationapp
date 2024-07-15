@@ -1,3 +1,5 @@
+import { AnyActorRef } from "xstate";
+
 export type TaterContext = {
   recognition: SpeechRecognition | null;
   textareaId: string;
@@ -16,6 +18,8 @@ export type TaterContext = {
   newResult: SpeechRecognitionResult | null;
   newText: string | null;
   micState: "awake" | "asleep" | "off";
+  speechApiActor?: AnyActorRef | null;
+  textareaActor?: AnyActorRef | null;
   [key: string]: any;
 };
 

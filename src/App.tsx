@@ -5,7 +5,7 @@ import { Buttons } from "./components/Buttons";
 import Indicators from "./components/Indicators";
 import initializeTater from "./xstate/effects/initialize_tater";
 import subscribeToTater from "./xstate/effects/subscribe_to_tater";
-import { textareaOnChange } from "./xstate/helpers/textarea_onchange";
+// import { textareaOnChange } from "./xstate/helpers/textarea_onchange";
 import { taterMachineContext } from "./xstate/tater_machine_context";
 import TaterFatal from "./components/errors/tater_fatal";
 
@@ -18,11 +18,6 @@ function App() {
 
   useEffect(() => subscribeToTater(taterRef), [taterRef]); // for logging
   useEffect(() => initializeTater(taterRef), [taterRef]); // init Web Speech API
-  useEffect(
-    // TODO: Move to speech callback machine
-    () => textareaOnChange({ textareaRef, taterRef }),
-    [textareaRef, taterRef]
-  );
 
   return (
     <>

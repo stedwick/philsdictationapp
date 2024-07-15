@@ -5,6 +5,7 @@ import { aTextareaEl } from "./assigns/init";
 import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import { punctuationMachine } from "./logic/punctuation_machine";
 import speechAPILogic from "./logic/speech_api_callback";
+import textareaLogic from "./logic/textarea_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
 import { aTextareaCurrentValues } from "./assigns/textarea";
 import { loadSavedText, saveText } from "./actions/save_and_load";
@@ -35,9 +36,10 @@ export const taterMachine = setup({
     logHeard: ({ event }) => debugLog && console.log(`>>>>> Heard: ${event.result[0].transcript}`),
   },
   actors: {
-    initSpeechAPI: initSpeechAPILogic,
-    speechAPI: speechAPILogic,
-    punctuationMachine: punctuationMachine,
+    initSpeechAPILogic,
+    speechAPILogic,
+    textareaLogic,
+    punctuationMachine,
     voiceCommandMachine: fromPromise(async function() { }),
   },
   guards: {
@@ -85,16 +87,22 @@ export const taterMachine = setup({
         assign(aTextareaCurrentValues),
       ],
       invoke: {
-        src: "initSpeechAPI",
+        src: "initSpeechAPILogic",
         onDone: {
           actions: [
             assign({ recognition: ({ event }) => event.output }),
             assign({
-              speechApi: ({ context, spawn }) => {
+              speechApiActor: ({ context, spawn }) => {
                 const recognition = context.recognition!;
-                return spawn("speechAPI", {
+                return spawn("speechAPILogic", {
                   id: "speechAPIMachine",
                   input: { recognition },
+                });
+              },
+              textareaActor: ({ context: { textareaEl }, spawn }) => {
+                return spawn("textareaLogic", {
+                  id: "textareaMachine",
+                  input: { textareaEl },
                 });
               },
             }),
@@ -224,7 +232,6 @@ export const taterMachine = setup({
                 },
               },
             },
-            // TODO: Scroll into view
             writing: {
               entry: [
                 assign({
