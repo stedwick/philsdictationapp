@@ -8,13 +8,16 @@ import subscribeToTater from "./xstate/effects/subscribe_to_tater";
 // import { textareaOnChange } from "./xstate/helpers/textarea_onchange";
 import { taterMachineContext } from "./xstate/tater_machine_context";
 import TaterFatal from "./components/errors/tater_fatal";
+import { AnyMachineSnapshot } from "xstate";
+
+const erroredSelector = (state: AnyMachineSnapshot) => state.matches("errored");
 
 function App() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // New XState 'Tater Machine
   const taterRef = taterMachineContext.useActorRef();
-  const taterFatal = taterMachineContext.useSelector((state) => state.matches("errored"));
+  const taterFatal = taterMachineContext.useSelector(erroredSelector);
 
   useEffect(() => subscribeToTater(taterRef), [taterRef]); // for logging
   useEffect(() => initializeTater(taterRef), [taterRef]); // init Web Speech API
