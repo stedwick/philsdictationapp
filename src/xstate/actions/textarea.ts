@@ -1,19 +1,14 @@
 import type { TaterContext } from "../types/tater_context";
 
-const readTextarea = (el: HTMLTextAreaElement) => ({
-  value: el.value,
-  beforeSelection: el.value.substring(0, el.selectionStart),
-  selection: el.value.substring(el.selectionStart, el.selectionEnd),
-  afterSelection: el.value.substring(el.selectionEnd, el.textLength),
+const readTextarea = ({ textareaEl }: { textareaEl: HTMLTextAreaElement }) => ({
+  value: textareaEl.value,
+  beforeSelection: textareaEl.value.substring(0, textareaEl.selectionStart),
+  selection: textareaEl.value.substring(textareaEl.selectionStart, textareaEl.selectionEnd),
+  afterSelection: textareaEl.value.substring(textareaEl.selectionEnd, textareaEl.textLength),
 });
 
-type WriteParams = {
-  textareaNewValues: TaterContext["textareaNewValues"];
-  textareaEl: HTMLTextAreaElement;
-};
-
-function writeTextarea({ textareaNewValues, textareaEl }: WriteParams) {
-  const currentValues = readTextarea(textareaEl);
+function writeTextarea({ context: { textareaNewValues, textareaEl } }: { context: TaterContext }) {
+  const currentValues = readTextarea({ textareaEl });
 
   const beforeSelection =
     textareaNewValues.beforeSelection || currentValues.beforeSelection;
@@ -23,10 +18,14 @@ function writeTextarea({ textareaNewValues, textareaEl }: WriteParams) {
 
   textareaEl.value = beforeSelection + selection + afterSelection;
 
-  // TODO: select interim
-  // textareaEl.selectionStart = beforeSelection.length + 1;
   textareaEl.selectionStart = beforeSelection.length + selection.length;
   textareaEl.selectionEnd = beforeSelection.length + selection.length;
 }
 
-export { readTextarea, writeTextarea };
+function selectNewText({ context: { textareaCurrentValues, textareaNewValues: { beforeSelection, selection }, textareaEl } }: { context: TaterContext }) {
+  // MAYBE: Worry about blank "" strings?
+  textareaEl.selectionStart = (beforeSelection || textareaCurrentValues.beforeSelection).length;
+  textareaEl.selectionEnd = (beforeSelection || textareaCurrentValues.beforeSelection).length + (selection || "").length;
+}
+
+export { readTextarea, writeTextarea, selectNewText };

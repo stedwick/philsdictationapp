@@ -1,6 +1,6 @@
 import { assign, fromPromise, raise, setup } from "xstate";
 import cutText from "./actions/cut_text";
-import { writeTextarea } from "./actions/textarea";
+import { selectNewText, writeTextarea } from "./actions/textarea";
 import { aTextareaEl } from "./assigns/init";
 import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import { punctuationMachine } from "./logic/punctuation_machine";
@@ -19,12 +19,10 @@ export const taterMachine = setup({
     context: {} as TaterContext,
   },
   actions: {
-    focus: ({ context: { textareaEl } }) => textareaEl.focus(),
     saveText,
     loadSavedText,
-    writeTextarea: ({ context: { textareaNewValues, textareaEl } }) => writeTextarea({
-      textareaNewValues, textareaEl,
-    }),
+    writeTextarea,
+    selectNewText,
     cutText: ({ context: { textareaEl } }) => cutText(textareaEl),
     turnMicOn: ({ context: { recognition } }) => recognition!.start(),
     turnMicOff: ({ context: { recognition } }) => recognition!.stop(),
@@ -33,6 +31,7 @@ export const taterMachine = setup({
     setVoiceCommand: function() { },
     execCmd: function() { },
     resetSpeechCycle: function() { },
+    focus: ({ context: { textareaEl } }) => textareaEl.focus(),
     logHeard: ({ event }) => debugLog && console.log(`>>>>> Heard: ${event.result[0].transcript}`),
   },
   actors: {
@@ -48,12 +47,8 @@ export const taterMachine = setup({
     isAsleep: function() {
       return true;
     },
-    isInterimResult: function() {
-      return false;
-    },
-    isFinalResult: function() {
-      return true;
-    },
+    isInterimResult: ({ context: { newResult } }) => !!!newResult?.isFinal,
+    isFinalResult: ({ context: { newResult } }) => !!newResult?.isFinal,
     isText: function() {
       return true;
     },
@@ -160,7 +155,7 @@ export const taterMachine = setup({
                   target: "hearing",
                   actions: [
                     assign(({ event }) => ({
-                      newResult: event.result[0],
+                      newResult: event.result,
                       newText: event.result[0].transcript,
                     })),
                     { type: "logHeard" },
@@ -229,13 +224,12 @@ export const taterMachine = setup({
                 },
               },
             },
-            // TODO: Handle interim and final results
             // TODO: Scroll into view
             writing: {
               entry: [
                 assign({
                   textareaNewValues: ({ context }) => ({
-                    beforeSelection: null, // TODO: selection
+                    beforeSelection: null,
                     selection: context.newText,
                     afterSelection: null,
                   })
@@ -243,6 +237,22 @@ export const taterMachine = setup({
                 { type: "writeTextarea" },
                 // Setting the value directly does not trigger an input event. Typing and pasting does.
                 raise({ type: "textareaInputEvent" }),
+              ],
+              always: [
+                {
+                  target: "selectingNewText",
+                  guard: { type: "isInterimResult" }
+                },
+                {
+                  target: "saving",
+                  guard: { type: "isFinalResult" }
+                },
+              ],
+            },
+            selectingNewText: {
+              entry: [
+                { type: "selectNewText" },
+                raise({ type: "textareaInputEvent" })
               ],
               always: { target: "saving" },
             },

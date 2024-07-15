@@ -33,8 +33,7 @@ export default fromPromise(async function() {
   // TODO: auto start & stop on focus
   recognition.continuous = true;
   recognition.lang = "en-US";
-  // TODO: interim results
-  recognition.interimResults = false;
+  recognition.interimResults = true;
   recognition.maxAlternatives = 5;
 
   return recognition;
