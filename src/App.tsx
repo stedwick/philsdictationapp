@@ -41,11 +41,10 @@ function App() {
             className="textarea textarea-primary textarea-lg w-full h-full"
             ref={textareaRef}
           ></textarea>
-          <div className="absolute bottom-2 left-0 right-0 flex justify-end space-x-2 px-2">
-            {/* TODO: Move and add auto-listen */}
-            <Indicators />
-          </div>
         </div>
+
+        {/* TODO: Move and add auto-listen */}
+        <Indicators />
 
         {taterFatal && <TaterFatal />}
 
