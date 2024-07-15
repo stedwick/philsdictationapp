@@ -61,10 +61,10 @@ export function usePhilSpeech(
 
   // Rudimentary auto-mic based on window Focus gained and lost.
   useEffect(() => {
-    window.addEventListener("focus", function () {
+    window.addEventListener("focus", function() {
       setDictationState("on");
     });
-    window.addEventListener("blur", function () {
+    window.addEventListener("blur", function() {
       setDictationState("off");
     });
   }, []);

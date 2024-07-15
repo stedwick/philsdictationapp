@@ -31,7 +31,7 @@ export const taterMachine = setup({
     setVoiceCommand: function() { },
     execCmd: function() { },
     resetSpeechCycle: function() { },
-    focus: ({ context: { textareaEl } }) => textareaEl.focus(),
+    focus: ({ context: { textareaEl } }) => { textareaEl.blur(); textareaEl.focus() },
     logHeard: ({ event }) => debugLog && console.log(`>>>>> Heard: ${event.result[0].transcript}`),
   },
   actors: {
@@ -235,6 +235,8 @@ export const taterMachine = setup({
                   })
                 }),
                 { type: "writeTextarea" },
+                // Blurring and then refocusing scrolls the text into view if it's past the bottom of the text area.
+                { type: "focus" },
                 // Setting the value directly does not trigger an input event. Typing and pasting does.
                 raise({ type: "textareaInputEvent" }),
               ],
