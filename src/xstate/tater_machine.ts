@@ -171,7 +171,7 @@ export const taterMachine = setup({
             autoOff: {
               target: "off",
               // Should Sleep listen in the background? I think I want another config option for listening in the background.
-              // TODO: listen in the background
+              // MAYBE: listen in the background
               // guard: "isAutoMic",
             }
           },
@@ -189,6 +189,8 @@ export const taterMachine = setup({
                   // actions: { type: "logHeard" }
                 },
               },
+              // MAYBE: implement asleep state w/ wake up
+              always: { target: "#Tater.initialized.off" },
             },
             awake: {
               entry: [
@@ -309,7 +311,7 @@ export const taterMachine = setup({
               entry: { type: "saveText" },
               always: { target: "awake" },
             },
-            // TODO: Wake up command
+            // MAYBE: Wake up command
             hearingWhileAsleep: {
               always: { target: "asleep" },
             },
