@@ -87,7 +87,7 @@ const spaceComesNextRegex = new RegExp(`[^\\s${charsWithOnlySpaceBefore}${charsW
 const spaceComesBeforeRegex = new RegExp(`^[^${charsWithOnlySpaceAfter}]`);
 // window.regex = capitalizeNextRegex;
 
-const debugLog = false; // import.meta.env.VITE_DEBUG === "true";
+const debugLog = false; // import.meta.env.VITE_DEBUG;
 
 type PunctuationMachineContext = {
   before: string;
@@ -173,7 +173,6 @@ export const punctuationMachine = setup({
             // Open and close quotes
             text = text.replace(/start quotations?\s*/gi, '"');
             text = text.replace(/\s*finish(ed)? quotations?/gi, '"');
-            // MAYBE: Single quotes?
             // Apostrophe s
             text = text.replace(/\s*apostrophe(s| s)?/gi, "'s");
             // Dash with spaces
@@ -263,27 +262,7 @@ export const punctuationMachine = setup({
           }
         }),
         ({ context: { text } }) => debugLog && console.log("_trim_ [", text, "]"),
-
-        // MAYBE: SUPER edge cases, not worrying about these for now
-        // 3:30 p.m. -But it was tomorrow
       ],
     },
   },
 });
-
-// Is padding a problem?
-// Pad text with the last/first non-space characters from before and after.
-// This affects punctuation, for example:
-// "...end." + text + "(and..."
-//
-// assign(({ context: { before, text, after } }) => {
-//   const padBefore = before.match(/[^\s]*\s*$/)?.[0] || "";
-//   const padAfter = after.match(/^\s*[^\s]*/)?.[0] || "";
-//   return {
-//     text: padBefore + text + padAfter,
-//     numCharsPaddedBefore: padBefore.length,
-//     numCharsPaddedAfter: padAfter.length,
-//   };
-// }),
-// ({ context: { text } }) => console.log("<pad>: [", text, "]"),
-
