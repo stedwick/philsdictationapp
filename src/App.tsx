@@ -43,7 +43,6 @@ function App() {
           ></textarea>
         </div>
 
-        {/* TODO: Move and add auto-listen */}
         <Indicators />
 
         {taterFatal && <TaterFatal />}
