@@ -10,6 +10,7 @@ import windowLogic from "./logic/window_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
 import { aTextareaCurrentValues } from "./assigns/textarea";
 import { loadSavedText, saveText } from "./actions/save_and_load";
+import { loadConfig, saveConfig } from "./actions/config";
 
 const debugLog = import.meta.env.VITE_DEBUG;
 
@@ -21,6 +22,7 @@ export const taterMachine = setup({
     context: {} as TaterContext,
   },
   actions: {
+    saveConfig,
     saveText,
     loadSavedText,
     writeTextarea,
@@ -89,6 +91,7 @@ export const taterMachine = setup({
         { type: "loadSavedText" },
         { type: "focus" },
         assign(aTextareaCurrentValues),
+        assign({ config: loadConfig() }),
       ],
       invoke: {
         src: "initSpeechAPILogic",
@@ -138,12 +141,15 @@ export const taterMachine = setup({
           ]
         },
         setConfig: {
-          actions: assign({
-            config: ({ context: { config }, event }) => {
-              config[event.key] = event.value;
-              return config;
-            }
-          })
+          actions: [
+            assign({
+              config: ({ context: { config }, event }) => {
+                config[event.key] = event.value;
+                return config;
+              }
+            }),
+            { type: "saveConfig" }
+          ]
         }
       },
       states: {
@@ -162,7 +168,12 @@ export const taterMachine = setup({
           exit: [{ type: "turnMicOff" }, assign({ micState: "off" })],
           on: {
             turnOff: { target: "off" },
-            autoOff: { target: "off" }
+            autoOff: {
+              target: "off",
+              // Should Sleep listen in the background? I think I want another config option for listening in the background.
+              // TODO: listen in the background
+              // guard: "isAutoMic",
+            }
           },
           states: {
             asleep: {
