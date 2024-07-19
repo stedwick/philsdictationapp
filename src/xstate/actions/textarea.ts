@@ -23,9 +23,9 @@ function writeTextarea({ context: { textareaNewValues, textareaEl } }: { context
 }
 
 function selectNewText({ context: { textareaCurrentValues, textareaNewValues: { beforeSelection, selection }, textareaEl } }: { context: TaterContext }) {
-  // MAYBE: Worry about blank "" strings?
-  textareaEl.selectionStart = (beforeSelection || textareaCurrentValues.beforeSelection).length;
-  textareaEl.selectionEnd = (beforeSelection || textareaCurrentValues.beforeSelection).length + (selection || "").length;
+  // https://stackoverflow.com/a/5515385/103316
+  textareaEl.selectionStart = ((beforeSelection != null) ? beforeSelection : textareaCurrentValues.beforeSelection).length;
+  textareaEl.selectionEnd = ((beforeSelection != null) ? beforeSelection : textareaCurrentValues.beforeSelection).length + (selection || "").length;
 }
 
 export { readTextarea, writeTextarea, selectNewText };
