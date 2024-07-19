@@ -6,10 +6,17 @@ import { taterMachineContext } from "../xstate/tater_machine_context";
 
 const listeningSelector = (state: AnyMachineSnapshot) =>
   state.context.micState != "off";
+const autoMicSelector = (state: AnyMachineSnapshot) =>
+  state.context.config.autoMic;
 
 export default function Indicators() {
   const isListening = taterMachineContext.useSelector(listeningSelector);
+  const isAutoMic = taterMachineContext.useSelector(autoMicSelector);
+  const taterActor = taterMachineContext.useActorRef();
   const [isOnline, setIsOnline] = useState(true);
+  const setAutoMic = (event: React.ChangeEvent<HTMLInputElement>) => taterActor.send({
+    type: "setConfig", key: "autoMic", value: event.target.checked
+  });
 
   useEffect(() => {
     const onlineInterval = setInterval(
@@ -23,10 +30,11 @@ export default function Indicators() {
     <div className="w-full flex justify-between space-x-2 pb-3">
       <div className="form-control">
         <label className="label cursor-pointer pt-0 pl-0">
-          <input type="checkbox" className="toggle toggle-sm toggle-primary" />
+          <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={isAutoMic && "checked"} onChange={setAutoMic} />
           <span className="label-text ml-2">Auto-listen</span>
         </label>
       </div>
+
       <div className="flex space-x-2">
         {!isListening && (
           <div className="tooltip" data-tip="Mic off">

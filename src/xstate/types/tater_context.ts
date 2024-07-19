@@ -15,6 +15,10 @@ export type TaterContext = {
     selection: string | null;
     afterSelection: string | null;
   };
+  config: {
+    autoMic: boolean;
+    [key: string]: any;
+  };
   newResult: SpeechRecognitionResult | null;
   newText: string | null;
   micState: "awake" | "asleep" | "off";
@@ -38,6 +42,9 @@ const initialTaterContext: TaterContext = {
     beforeSelection: null,
     selection: null,
     afterSelection: null,
+  },
+  config: {
+    autoMic: false,
   },
   newResult: null,
   newText: null,

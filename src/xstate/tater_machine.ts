@@ -11,7 +11,7 @@ import { TaterContext, initialTaterContext } from "./types/tater_context";
 import { aTextareaCurrentValues } from "./assigns/textarea";
 import { loadSavedText, saveText } from "./actions/save_and_load";
 
-const debugLog = import.meta.env.VITE_DEBUG === "true";
+const debugLog = import.meta.env.VITE_DEBUG;
 
 export const taterMachine = setup({
   types: {
@@ -34,7 +34,8 @@ export const taterMachine = setup({
     execCmd: function() { },
     resetSpeechCycle: function() { },
     focus: ({ context: { textareaEl } }) => { textareaEl.blur(); textareaEl.focus() },
-    logHeard: ({ event }) => debugLog && console.log(`>>>>> Heard: ${event.result[0].transcript}`),
+    logHeard: ({ event }) => debugLog && console.log(`heard: ${event.result[0].transcript}`),
+    logNewText: ({ context: { newText } }) => debugLog && console.log(`heard: ${newText}`),
   },
   actors: {
     initSpeechAPILogic,
@@ -65,6 +66,7 @@ export const taterMachine = setup({
     isSleepCommand: function() {
       return true;
     },
+    isAutoMic: ({ context: { config: { autoMic } } }) => autoMic,
   },
 }).createMachine({
   context: ({ input }) => ({
@@ -135,13 +137,24 @@ export const taterMachine = setup({
             { type: "saveText" }
           ]
         },
+        setConfig: {
+          actions: assign({
+            config: ({ context: { config }, event }) => {
+              config[event.key] = event.value;
+              return config;
+            }
+          })
+        }
       },
       states: {
         off: {
           on: {
             turnOn: { target: "on" },
-            autoOn: { target: "on" }
-          }
+            autoOn: {
+              target: "on",
+              guard: "isAutoMic",
+            }
+          },
         },
         on: {
           initial: "awake",
@@ -156,10 +169,13 @@ export const taterMachine = setup({
               entry: assign({ micState: "asleep" }),
               on: {
                 wake: { target: "awake", },
-                autoOn: { target: "awake", },
+                autoOn: {
+                  target: "awake",
+                  guard: "isAutoMic",
+                },
                 hear: {
                   target: "hearingWhileAsleep",
-                  actions: { type: "logHeard" }
+                  // actions: { type: "logHeard" }
                 },
               },
             },
@@ -178,7 +194,7 @@ export const taterMachine = setup({
                       newResult: event.result,
                       newText: event.result[0].transcript,
                     })),
-                    { type: "logHeard" },
+                    // { type: "logHeard", }
                   ],
                 },
               },
@@ -214,6 +230,7 @@ export const taterMachine = setup({
                   },
                 },
               ],
+              entry: ["logNewText"],
             },
             runningVoiceCommand: {
               invoke: {
