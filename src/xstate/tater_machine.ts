@@ -35,6 +35,7 @@ export const taterMachine = setup({
     setVoiceCommand: function() { },
     execCmd: function() { },
     resetSpeechCycle: function() { },
+    // TODO: [Focus] not on mobile https://kagi.com/search?q=mobile+focus+textarea+without+popping+up+keyboard
     focus: ({ context: { textareaEl } }) => { textareaEl.blur(); textareaEl.focus() },
     logHeard: ({ event }) => debugLog && console.log(`heard: ${event.result[0].transcript}`),
     logNewText: ({ context: { newText } }) => debugLog && console.log(`newText: ${newText}`),

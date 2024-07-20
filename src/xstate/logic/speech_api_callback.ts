@@ -6,6 +6,7 @@ export default fromCallback<EventObject, { recognition: SpeechRecognition }>(
       // https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognitionResultList
       // I think the results just keep piling up. Always send the most recent that's final or confident, and >= resultIndex
       // https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognitionEvent/resultIndex
+      // FIXME: [Results] are duplicated in some browsers, like on mobile
       const len = event.results.length - 1;
       for (let i = len; i >= event.resultIndex; i--) {
         if (event.results[i].isFinal || event.results[i][0].confidence > 0.01) {
