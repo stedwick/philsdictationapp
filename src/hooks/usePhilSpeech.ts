@@ -106,7 +106,7 @@ export function usePhilSpeech(
     resetTranscript();
   }, [finalTranscript]);
 
-  // Doesn't work?
+  // Grammar doesn't work?
   // const recognition = SpeechRecognition.getRecognition();
   // window.recognition = recognition;
   // const grammar =
