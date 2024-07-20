@@ -2,7 +2,7 @@ import { EventObject, fromCallback } from "xstate";
 
 export default fromCallback<EventObject, { textareaEl: HTMLTextAreaElement }>(
   ({ sendBack, input: { textareaEl } }) => {
-    let timeoutId: NodeJS.Timeout | null = null;
+    let timeoutId: number | null = null;
     const debounceRate = 500; // 0.5 seconds
 
     ["input", "select", "selectionchange", "click", "keydown"].forEach(
