@@ -12,7 +12,7 @@ import { aTextareaCurrentValues } from "./assigns/textarea";
 import { loadSavedText, saveText } from "./actions/save_and_load";
 import { loadConfig, saveConfig } from "./actions/config";
 
-const debugLog = import.meta.env.VITE_DEBUG;
+const debugLog = false; // import.meta.env.VITE_DEBUG;
 
 export const taterMachine = setup({
   types: {
@@ -37,7 +37,7 @@ export const taterMachine = setup({
     resetSpeechCycle: function() { },
     focus: ({ context: { textareaEl } }) => { textareaEl.blur(); textareaEl.focus() },
     logHeard: ({ event }) => debugLog && console.log(`heard: ${event.result[0].transcript}`),
-    logNewText: ({ context: { newText } }) => debugLog && console.log(`heard: ${newText}`),
+    logNewText: ({ context: { newText } }) => debugLog && console.log(`newText: ${newText}`),
   },
   actors: {
     initSpeechAPILogic,
@@ -171,7 +171,7 @@ export const taterMachine = setup({
             autoOff: {
               target: "off",
               // Should Sleep listen in the background? I think I want another config option for listening in the background.
-              // MAYBE: listen in the background
+              // MAYBE: [Sleep] Listen in the background
               // guard: "isAutoMic",
             }
           },
@@ -186,10 +186,10 @@ export const taterMachine = setup({
                 },
                 hear: {
                   target: "hearingWhileAsleep",
-                  // actions: { type: "logHeard" }
+                  actions: { type: "logHeard" }
                 },
               },
-              // MAYBE: implement asleep state w/ wake up
+              // MAYBE: [Sleep] Implement asleep state
               always: { target: "#Tater.initialized.off" },
             },
             awake: {
@@ -207,7 +207,7 @@ export const taterMachine = setup({
                       newResult: event.result,
                       newText: event.result[0].transcript,
                     })),
-                    // { type: "logHeard", }
+                    { type: "logHeard", }
                   ],
                 },
               },
@@ -264,7 +264,7 @@ export const taterMachine = setup({
                 onDone: {
                   actions: [
                     assign({ newText: ({ event }) => event.output }),
-                    ({ event }) => debugLog && console.log("punctuated: [", event.output, "]"),
+                    ({ event }) => console.log("punctuated: [", event.output, "]"),
                   ],
                   target: "writing",
                 },
@@ -311,7 +311,7 @@ export const taterMachine = setup({
               entry: { type: "saveText" },
               always: { target: "awake" },
             },
-            // MAYBE: Wake up command
+            // MAYBE: [Sleep] Wake up command
             hearingWhileAsleep: {
               always: { target: "asleep" },
             },
