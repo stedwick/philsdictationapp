@@ -35,7 +35,7 @@ export const taterMachine = setup({
     setVoiceCommand: function() { },
     execCmd: function() { },
     resetSpeechCycle: function() { },
-    // TODO: [Focus] not on mobile https://kagi.com/search?q=mobile+focus+textarea+without+popping+up+keyboard
+    // FIXME: [Focus] not on mobile https://kagi.com/search?q=mobile+focus+textarea+without+popping+up+keyboard
     focus: ({ context: { textareaEl } }) => { textareaEl.blur(); textareaEl.focus() },
     logHeard: ({ event }) => debugLog && console.log(`heard: ${event.result[0].transcript}`),
     logNewText: ({ context: { newText } }) => console.log(`heard: ${newText}`),
@@ -172,7 +172,7 @@ export const taterMachine = setup({
             autoOff: {
               target: "off",
               // Should Sleep listen in the background? I think I want another config option for listening in the background.
-              // MAYBE: [Sleep] Listen in the background
+              // [Sleep] Listen in the background
               // guard: "isAutoMic",
             }
           },
@@ -312,7 +312,7 @@ export const taterMachine = setup({
               entry: { type: "saveText" },
               always: { target: "awake" },
             },
-            // MAYBE: [Sleep] Wake up command
+            // [Sleep] Wake up command
             hearingWhileAsleep: {
               always: { target: "asleep" },
             },

@@ -25,6 +25,7 @@ function App() {
   return (
     <>
       <Toaster />
+      {/* TODO: Menu/sidebar */}
       <div
         className="container mx-auto px-4 py-4 flex flex-col"
         style={{ height: "100dvh" }}
