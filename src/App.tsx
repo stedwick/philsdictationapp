@@ -6,9 +6,9 @@ import Indicators from "./components/Indicators";
 import initializeTater from "./xstate/effects/initialize_tater";
 import subscribeToTater from "./xstate/effects/subscribe_to_tater";
 // import { textareaOnChange } from "./xstate/helpers/textarea_onchange";
-import { taterMachineContext } from "./xstate/tater_machine_context";
-import TaterFatal from "./components/errors/tater_fatal";
 import { AnyMachineSnapshot } from "xstate";
+import TaterFatal from "./components/errors/tater_fatal";
+import { taterMachineContext } from "./xstate/tater_machine_context";
 
 const erroredSelector = (state: AnyMachineSnapshot) => state.matches("errored");
 

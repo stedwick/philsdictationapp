@@ -30,11 +30,11 @@ export const taterMachine = setup({
     cutText: ({ context: { textareaEl } }) => cutText(textareaEl),
     turnMicOn: ({ context: { recognition } }) => recognition!.start(),
     turnMicOff: ({ context: { recognition } }) => recognition!.stop(),
-    checkSpeechResult: function() { },
-    checkForVoiceCommand: function() { },
-    setVoiceCommand: function() { },
-    execCmd: function() { },
-    resetSpeechCycle: function() { },
+    checkSpeechResult: function () { },
+    checkForVoiceCommand: function () { },
+    setVoiceCommand: function () { },
+    execCmd: function () { },
+    resetSpeechCycle: function () { },
     // FIXME: [Focus] not on mobile https://kagi.com/search?q=mobile+focus+textarea+without+popping+up+keyboard
     focus: ({ context: { textareaEl } }) => { textareaEl.blur(); textareaEl.focus() },
     logHeard: ({ event }) => debugLog && console.log(`heard: ${event.result[0].transcript}`),
@@ -46,27 +46,27 @@ export const taterMachine = setup({
     textareaLogic,
     windowLogic,
     punctuationMachine,
-    voiceCommandMachine: fromPromise(async function() { }),
+    voiceCommandMachine: fromPromise(async function () { }),
   },
   guards: {
-    isAwake: function() {
+    isAwake: function () {
       return true;
     },
-    isAsleep: function() {
+    isAsleep: function () {
       return true;
     },
     isInterimResult: ({ context: { newResult } }) => !!!newResult?.isFinal,
     isFinalResult: ({ context: { newResult } }) => !!newResult?.isFinal,
-    isText: function() {
+    isText: function () {
       return true;
     },
-    isCommand: function() {
+    isCommand: function () {
       return false;
     },
-    isWakeCommand: function() {
+    isWakeCommand: function () {
       return true;
     },
-    isSleepCommand: function() {
+    isSleepCommand: function () {
       return true;
     },
     isAutoMic: ({ context: { config: { autoMic } } }) => autoMic,
