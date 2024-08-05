@@ -84,10 +84,10 @@ const charsThatCapitalizeNextRegex = new RegExp(`([${charsThatCapitalizeNext}]\\
 
 const capitalizeNextRegex = new RegExp(`(^|[${charsThatCapitalizeNext}])\\W*$`);
 const spaceComesNextRegex = new RegExp(`[^\\s${charsWithOnlySpaceBefore}${charsWithNoSpaces}]$`);
-const spaceComesBeforeRegex = new RegExp(`^[^${charsWithOnlySpaceAfter}]`);
+const spaceComesBeforeRegex = new RegExp(`^[^\\s${charsWithOnlySpaceAfter}]`);
 // window.regex = capitalizeNextRegex;
 
-const debugLog = false; // import.meta.env.VITE_DEBUG;
+const debugLog = true; // import.meta.env.VITE_DEBUG;
 
 type PunctuationMachineContext = {
   before: string;
@@ -157,7 +157,7 @@ export const punctuationMachine = setup({
         // punctuationRegex
         assign({
           text: ({ context: { text } }) => {
-            return text.replace(punctuationRegex, function(matched: string) {
+            return text.replace(punctuationRegex, function (matched: string) {
               const matchedLowerCase = matched.toLowerCase();
               const mappedValue = punctuationMap[matchedLowerCase];
               return mappedValue || matched;
@@ -177,6 +177,7 @@ export const punctuationMachine = setup({
             text = text.replace(/\s*apostrophe(s| s)?/gi, "'s");
             // Dash with spaces
             text = text.replace(/\bdash sign\b/gi, "–"); // en dash
+            text = text.replace(/\b- sign\b/gi, "–"); // en dash
             return text;
           }
         }),
@@ -229,7 +230,7 @@ export const punctuationMachine = setup({
         // smileyRegex - Do this later so as not to confuse them with punctuation
         assign({
           text: ({ context: { text } }) => {
-            return text.replace(smileyRegex, function(matched: string) {
+            return text.replace(smileyRegex, function (matched: string) {
               const matchedLowerCase = matched.toLowerCase();
               const mappedValue = smileyMap[matchedLowerCase];
               return mappedValue || matched;
