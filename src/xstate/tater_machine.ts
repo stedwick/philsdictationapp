@@ -1,16 +1,17 @@
 import { assign, fromPromise, raise, setup } from "xstate";
+import { loadConfig, saveConfig } from "./actions/config";
 import cutText from "./actions/cut_text";
+import { loadSavedText, saveText } from "./actions/save_and_load";
 import { selectNewText, writeTextarea } from "./actions/textarea";
+import { turnMicOn } from "./actions/turn_mic_on";
 import { aTextareaEl } from "./assigns/init";
+import { aTextareaCurrentValues } from "./assigns/textarea";
 import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import { punctuationMachine } from "./logic/punctuation_machine";
 import speechAPILogic from "./logic/speech_api_callback";
 import textareaLogic from "./logic/textarea_callback";
 import windowLogic from "./logic/window_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
-import { aTextareaCurrentValues } from "./assigns/textarea";
-import { loadSavedText, saveText } from "./actions/save_and_load";
-import { loadConfig, saveConfig } from "./actions/config";
 
 const debugLog = false; // import.meta.env.VITE_DEBUG;
 
@@ -28,7 +29,7 @@ export const taterMachine = setup({
     writeTextarea,
     selectNewText,
     cutText: ({ context: { textareaEl } }) => cutText(textareaEl),
-    turnMicOn: ({ context: { recognition } }) => recognition!.start(),
+    turnMicOn: turnMicOn,
     turnMicOff: ({ context: { recognition } }) => recognition!.stop(),
     checkSpeechResult: function () { },
     checkForVoiceCommand: function () { },
