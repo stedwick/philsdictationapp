@@ -87,7 +87,7 @@ const spaceComesNextRegex = new RegExp(`[^\\s${charsWithOnlySpaceBefore}${charsW
 const spaceComesBeforeRegex = new RegExp(`^[^\\s${charsWithOnlySpaceAfter}]`);
 // window.regex = capitalizeNextRegex;
 
-const debugLog = true; // import.meta.env.VITE_DEBUG;
+const debugLog = false; // import.meta.env.VITE_DEBUG;
 
 type PunctuationMachineContext = {
   before: string;
@@ -176,6 +176,7 @@ export const punctuationMachine = setup({
             // Apostrophe s
             text = text.replace(/\s*apostrophe(s| s)?/gi, "'s");
             // Dash with spaces
+            // MAYBE: put in {} up top
             text = text.replace(/\bdash sign\b/gi, "–"); // en dash
             text = text.replace(/\b- sign\b/gi, "–"); // en dash
             return text;
