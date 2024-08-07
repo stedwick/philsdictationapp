@@ -29,6 +29,8 @@ export const taterMachine = setup({
     writeTextarea,
     selectNewText,
     cutText: ({ context: { textareaEl } }) => cutText(textareaEl),
+    // MAYBE: resetMic? Occasionally the web speech API sends interim results
+    // but never a final result, so Tater gets stuck with highlighted text.
     turnMicOn,
     turnMicOff: ({ context: { recognition } }) => recognition!.stop(),
     checkSpeechResult: function () { },
