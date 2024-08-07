@@ -29,7 +29,7 @@ export const taterMachine = setup({
     writeTextarea,
     selectNewText,
     cutText: ({ context: { textareaEl } }) => cutText(textareaEl),
-    turnMicOn: turnMicOn,
+    turnMicOn,
     turnMicOff: ({ context: { recognition } }) => recognition!.stop(),
     checkSpeechResult: function () { },
     checkForVoiceCommand: function () { },
