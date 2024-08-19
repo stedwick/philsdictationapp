@@ -171,7 +171,7 @@ export const punctuationMachine = setup({
           text: ({ context: { text } }) => {
             // These have special spacing rules, and it matters if they are left or right, so we can't use the map above.
             // Open and close quotes
-            text = text.replace(/start quotations?\s*/gi, '"');
+            text = text.replace(/start? quotations?\s*/gi, '"');
             text = text.replace(/\s*finish(ed)? quotations?/gi, '"');
             // Apostrophe s
             text = text.replace(/\s*apostrophe(s| s)?/gi, "'s");
