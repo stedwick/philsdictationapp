@@ -3,7 +3,7 @@ import {
   MicrophoneIcon,
   ScissorsIcon,
 } from "@heroicons/react/24/solid";
-import { LayoutGridIcon } from "lucide-react";
+import { YoutubeIcon } from "lucide-react";
 import { AnyMachineSnapshot } from "xstate";
 import { taterMachineContext } from "../xstate/tater_machine_context";
 
@@ -66,14 +66,22 @@ export const Buttons = () => {
       <div className="flex flex-wrap gap-2 justify-center">
         {/* import.meta.env.VITE_WEB */}
         <a
-          href="https://www.microsoft.com/store/apps/9NTPHH45FFRN"
+          href="https://www.youtube.com/@PhilipBrocoum"
           target="_blank"
         >
-          <button className="btn btn-outline btn-secondary">
-            <LayoutGridIcon className="h-6 w-6"></LayoutGridIcon>
-            {/* TODO: [Premium] with LemonSqueezy */}
-            Premium
+          <button className="btn">
+            <YoutubeIcon className="h-6 w-6"></YoutubeIcon>
+            1-minute tutorial
           </button>
+          {/* <a */}
+          {/*   href="https://www.microsoft.com/store/apps/9NTPHH45FFRN" */}
+          {/*   target="_blank" */}
+          {/* > */}
+          {/* <button className="btn btn-outline btn-secondary"> */}
+          {/*   <LayoutGridIcon className="h-6 w-6"></LayoutGridIcon> */}
+          {/*   TODO: [Premium] with LemonSqueezy */}
+          {/*   Premium */}
+          {/* </button> */}
         </a>
       </div>
     </div>
