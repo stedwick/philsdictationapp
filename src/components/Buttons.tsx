@@ -66,7 +66,7 @@ export const Buttons = () => {
       <div className="flex flex-wrap gap-2 justify-center">
         {/* import.meta.env.VITE_WEB */}
         <a
-          href="https://www.youtube.com/@PhilipBrocoum"
+          href="https://youtu.be/47E8MYEPQrI"
           target="_blank"
         >
           <button className="btn">
