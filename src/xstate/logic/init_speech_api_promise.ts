@@ -1,5 +1,5 @@
 import { fromPromise } from "xstate";
-import { isDesktop } from "../../helpers/mobile";
+import { isDesktop } from "../helpers/mobile";
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API
 export default fromPromise(async function () {
