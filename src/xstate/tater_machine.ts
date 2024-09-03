@@ -12,6 +12,7 @@ import speechAPILogic from "./logic/speech_api_callback";
 import textareaLogic from "./logic/textarea_callback";
 import windowLogic from "./logic/window_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
+import { isMobile } from "../helpers/mobile";
 
 const debugLog = false; // import.meta.env.VITE_DEBUG;
 
@@ -39,7 +40,7 @@ export const taterMachine = setup({
     execCmd: function () { },
     resetSpeechCycle: function () { },
     // FIXME: [Focus] not on mobile https://kagi.com/search?q=mobile+focus+textarea+without+popping+up+keyboard
-    focus: ({ context: { textareaEl } }) => { textareaEl.blur(); textareaEl.focus() },
+    focus: ({ context: { textareaEl } }) => { if (isMobile) return; textareaEl.blur(); textareaEl.focus() },
     logHeard: ({ event }) => debugLog && console.log(`heard: ${event.result[0].transcript}`),
     logNewText: ({ context: { newText } }) => console.log(`heard: ${newText}`),
   },
