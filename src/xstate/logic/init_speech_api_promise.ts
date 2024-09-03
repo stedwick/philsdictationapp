@@ -1,7 +1,8 @@
 import { fromPromise } from "xstate";
+import { isDesktop } from "../../helpers/mobile";
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API
-export default fromPromise(async function() {
+export default fromPromise(async function () {
   const SpeechRecognition =
     window.SpeechRecognition || window.webkitSpeechRecognition;
   // const SpeechGrammarList =
@@ -32,7 +33,7 @@ export default fromPromise(async function() {
 
   recognition.continuous = true;
   recognition.lang = "en-US";
-  recognition.interimResults = true;
+  recognition.interimResults = isDesktop;
   recognition.maxAlternatives = 5;
 
   return recognition;
