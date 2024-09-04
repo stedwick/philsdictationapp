@@ -282,8 +282,9 @@ export const taterMachine = setup({
               entry: [
                 assign({
                   textareaNewValues: ({ context }) => ({
-                    ...context.textareaCurrentValues,
+                    beforeSelection: null,
                     selection: context.newText,
+                    afterSelection: null,
                   })
                 }),
                 { type: "writeTextarea" },
