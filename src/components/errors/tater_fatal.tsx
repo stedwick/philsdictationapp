@@ -8,7 +8,7 @@ export default function TaterFatal() {
     >
       <ExclamationCircleIcon className="h-6 w-6 shrink-0"></ExclamationCircleIcon>
       <span className="font-bold">
-        Your web browser doesn't support speech recognition. TaterTalk works best in Chrome, Edge, and Safari.
+        Your web browser doesn't support speech recognition.
       </span>
     </div>
   );
