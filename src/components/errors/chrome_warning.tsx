@@ -1,10 +1,11 @@
 import { ExclamationTriangleIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { useLocalStorage } from "@uidotdev/usehooks";
+import { isGoogleChromeOfficial } from "../../xstate/helpers/mobile";
 
 function ChromeWarning() {
   const [showChromeWarning, setShowChromeWarning] = useLocalStorage(
     "showChromeWarning",
-    true
+    !isGoogleChromeOfficial
   );
 
   if (!showChromeWarning) {
