@@ -16,7 +16,7 @@ function ChromeWarning() {
     <div role="alert" className="alert alert-warning mb-4 max-w-lg mx-auto">
       <ExclamationTriangleIcon className="h-6 w-6 shrink-0" />
       <span>
-        FYI, TaterTalk only works in{" "}
+        FYI, TaterTalk works best in{" "}
         <a
           href="https://www.google.com/chrome/"
           className="link"
