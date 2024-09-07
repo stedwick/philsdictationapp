@@ -7,6 +7,7 @@ import initializeTater from "./xstate/effects/initialize_tater";
 import subscribeToTater from "./xstate/effects/subscribe_to_tater";
 // import { textareaOnChange } from "./xstate/helpers/textarea_onchange";
 import { AnyMachineSnapshot } from "xstate";
+import ChromeWarning from "./components/errors/chrome_warning";
 import TaterFatal from "./components/errors/tater_fatal";
 import { taterMachineContext } from "./xstate/tater_machine_context";
 
@@ -47,6 +48,8 @@ function App() {
         <Indicators />
 
         {taterFatal && <TaterFatal />}
+
+        <ChromeWarning />
 
         <Buttons />
       </div>
