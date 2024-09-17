@@ -201,7 +201,7 @@ export const taterMachine = setup({
                 assign({ micState: "awake" }),
                 { type: "focus" }
               ],
-              after: { 10000: { target: "asleep" } },
+              after: { 15000: { target: "asleep" } },
               on: {
                 sleep: { target: "asleep" },
                 hear: {
