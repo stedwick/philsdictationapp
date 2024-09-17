@@ -10,34 +10,34 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@heroicons/react": "^2.0.18",
-    "@mariojgt/wind-notify": "^0.1.2",
-    "@tauri-apps/api": "^1.5.1",
+    "@heroicons/react": "^2.1.5",
+    "@mariojgt/wind-notify": "^1.0.0",
+    "@tauri-apps/api": "^1.6.0",
     "@uidotdev/usehooks": "^2.4.1",
     "@xstate/cli": "^0.5.17",
-    "@xstate/react": "^4.1.1",
-    "lucide-react": "^0.292.0",
+    "@xstate/react": "^4.1.2",
+    "lucide-react": "^0.441.0",
     "netlify-cli": "^15.0.2",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
     "react-speech-recognition": "^3.10.0",
-    "regenerator-runtime": "^0.14.0",
+    "regenerator-runtime": "^0.14.1",
     "use-navigator-online": "^3.2.4",
-    "xstate": "^5.13.2"
+    "xstate": "^5.18.1"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.5.6",
-    "@types/react": "^18.2.15",
-    "@types/react-dom": "^18.2.7",
+    "@tauri-apps/cli": "^1.6.2",
+    "@types/react": "^18.3.7",
+    "@types/react-dom": "^18.3.0",
     "@types/react-speech-recognition": "^3.9.5",
-    "@vitejs/plugin-react": "^4.0.3",
-    "autoprefixer": "^10.4.16",
-    "daisyui": "^4.4.2",
-    "postcss": "^8.4.31",
-    "tailwindcss": "^3.3.5",
-    "typescript": "^5.4.5",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "daisyui": "^4.12.10",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.11",
+    "typescript": "^5.6.2",
     "user-agent-data-types": "^0.4.2",
-    "vite": "^4.4.4"
+    "vite": "^5.4.6"
   }
 }
