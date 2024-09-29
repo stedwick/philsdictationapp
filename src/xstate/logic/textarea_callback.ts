@@ -9,7 +9,7 @@ export default fromCallback<EventObject, { textareaEl: HTMLTextAreaElement }>(
       (event) => {
         textareaEl.addEventListener(event, () => {
           timeoutId && clearTimeout(timeoutId);
-          timeoutId = setTimeout(function() {
+          timeoutId = setTimeout(function () {
             sendBack({ type: "textareaInputEvent" });
           }, debounceRate);
         });

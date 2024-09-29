@@ -1,4 +1,5 @@
 import { EventObject, fromCallback } from "xstate";
+import { SpeechResultInterface } from "../types/speech_interface";
 
 export default fromCallback<EventObject, { recognition: SpeechRecognition }>(
   ({ sendBack, input: { recognition } }) => {
@@ -10,7 +11,11 @@ export default fromCallback<EventObject, { recognition: SpeechRecognition }>(
       const len = event.results.length - 1;
       for (let i = len; i >= event.resultIndex; i--) {
         if (event.results[i].isFinal || event.results[i][0].confidence > 0.01) {
-          sendBack({ type: "hear", result: event.results[i] });
+          const resultInterface: SpeechResultInterface = {
+            isFinal: event.results[i].isFinal,
+            transcript: event.results[i][0].transcript,
+          }
+          sendBack({ type: "hear", result: resultInterface });
           break;
         }
       }

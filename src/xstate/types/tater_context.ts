@@ -1,4 +1,5 @@
 import { AnyActorRef } from "xstate";
+import { SpeechResultInterface } from "./speech_interface";
 
 export type TaterContext = {
   recognition: SpeechRecognition | null;
@@ -19,7 +20,7 @@ export type TaterContext = {
     autoMic: boolean;
     [key: string]: any;
   };
-  newResult: SpeechRecognitionResult | null;
+  newResult: SpeechResultInterface | null;
   newText: string | null;
   micState: "awake" | "asleep" | "off";
   speechApiActor?: AnyActorRef | null;

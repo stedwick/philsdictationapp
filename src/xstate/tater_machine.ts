@@ -58,8 +58,8 @@ export const taterMachine = setup({
     isAsleep: function () {
       return true;
     },
-    isInterimResult: ({ context: { newResult } }) => !!!newResult?.isFinal,
-    isFinalResult: ({ context: { newResult } }) => !!newResult?.isFinal,
+    isInterimResult: ({ context: { newResult } }) => !newResult!.isFinal,
+    isFinalResult: ({ context: { newResult } }) => newResult!.isFinal,
     isText: function () {
       return true;
     },
@@ -209,7 +209,7 @@ export const taterMachine = setup({
                   actions: [
                     assign(({ event }) => ({
                       newResult: event.result,
-                      newText: event.result[0].transcript,
+                      newText: event.result.transcript,
                     })),
                     { type: "logHeard", }
                   ],
