@@ -1,8 +1,8 @@
 import { AnyActorRef } from "xstate";
-import { SpeechResultInterface } from "./speech_interface";
+import { SpeechRecognitionInterface, SpeechResultInterface } from "./speech_interface";
 
 export type TaterContext = {
-  recognition: SpeechRecognition | null;
+  recognition: SpeechRecognitionInterface | null;
   textareaId: string;
   textareaEl: HTMLTextAreaElement;
   textareaCurrentValues: {

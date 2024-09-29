@@ -1,5 +1,6 @@
 import { fromPromise } from "xstate";
 import { isDesktop } from "../helpers/mobile";
+import type { SpeechRecognitionInterface } from "../types/speech_interface";
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Web_Speech_API/Using_the_Web_Speech_API
 export default fromPromise(async function () {
@@ -36,5 +37,11 @@ export default fromPromise(async function () {
   recognition.interimResults = isDesktop;
   recognition.maxAlternatives = 5;
 
-  return recognition;
+  const speechRecognitionInterface: SpeechRecognitionInterface = {
+    start: () => recognition.start(),
+    stop: () => recognition.stop(),
+    WebSpeechAPI: recognition
+  }
+
+  return speechRecognitionInterface;
 });
