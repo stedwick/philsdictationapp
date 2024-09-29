@@ -6,10 +6,10 @@ import { selectNewText, writeTextarea } from "./actions/textarea";
 import { turnMicOn } from "./actions/turn_mic_on";
 import { aTextareaEl } from "./assigns/init";
 import { aTextareaCurrentValues } from "./assigns/textarea";
-// import initSpeechAPILogic from "./logic/init_speech_api_promise";
-import initSpeechAPILogic from "./logic/init_assemblyai_promise";
-// import speechAPILogic from "./logic/speech_api_callback";
-import speechAPILogic from "./logic/assemblyai_callback";
+import initSpeechAPILogic from "./logic/init_speech_api_promise";
+import initAssemblyAILogic from "./logic/init_assemblyai_promise";
+import speechAPILogic from "./logic/speech_api_callback";
+import assemblyAILogic from "./logic/assemblyai_callback";
 import { punctuationMachine } from "./logic/punctuation_machine";
 import textareaLogic from "./logic/textarea_callback";
 import windowLogic from "./logic/window_callback";
@@ -17,6 +17,9 @@ import { TaterContext, initialTaterContext } from "./types/tater_context";
 import { isMobile } from "./helpers/mobile";
 
 const debugLog = false; // import.meta.env.VITE_DEBUG;
+
+const initSpeechAPILogicToUse = import.meta.env.VITE_ASSEMBLYAI_TOKEN ? initAssemblyAILogic : initSpeechAPILogic;
+const speechAPILogicToUse = import.meta.env.VITE_ASSEMBLYAI_TOKEN ? assemblyAILogic : speechAPILogic;
 
 export const taterMachine = setup({
   types: {
@@ -46,8 +49,8 @@ export const taterMachine = setup({
     logNewText: ({ context: { newText } }) => console.log(`heard: ${newText}`),
   },
   actors: {
-    initSpeechAPILogic,
-    speechAPILogic,
+    initSpeechAPILogic: initSpeechAPILogicToUse,
+    speechAPILogic: speechAPILogicToUse,
     textareaLogic,
     windowLogic,
     punctuationMachine,
