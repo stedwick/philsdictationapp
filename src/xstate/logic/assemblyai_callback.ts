@@ -15,14 +15,14 @@ export default fromCallback<EventObject, { recognition: SpeechRecognitionInterfa
       sendBack({ type: "hear", result: resultInterface });
     });
 
-    recognition.AssemblyAI.on('error', event => {
-      console.error(event);
-      recognition.AssemblyAI!.close();
-    });
-
     recognition.AssemblyAI.on('close', (code, reason) => {
       console.log(`Connection closed: ${code} ${reason}`);
       sendBack({ type: "turnOff" });
+    });
+
+    recognition.AssemblyAI.on('error', event => {
+      console.error(event);
+      recognition.AssemblyAI!.close();
     });
   }
 );
