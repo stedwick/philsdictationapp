@@ -36,8 +36,10 @@ const RevAiDemo = () => {
 
       websocket.current.onmessage = (event) => {
         const result = JSON.parse(event.data);
+        console.log('Received result:', result);
         if (result.type === 'partial' || result.type === 'final') {
-          setTranscript(prevTranscript => prevTranscript + ' ' + result.elements[0].value);
+          const text = result.elements.map((e) => e.value).join(' ');
+          setTranscript(text);
         }
       };
 
