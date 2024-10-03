@@ -29,8 +29,17 @@ let recognizeStream;
 const streamingConfig = {
   config: {
     encoding: "WEBM_OPUS",
-    sampleRateHertz: 16000,
+    sampleRateHertz: 48000,
     languageCode: "en-US",
+    model: "default",
+    useEnhanced: true,
+    enableAutomaticPunctuation: true,
+    enableWordTimeOffsets: true,
+    speechContexts: [
+      {
+        phrases: ["Fanita", "Syncta", "SentryPlus"],
+      },
+    ],
   },
   interimResults: true,
 };
