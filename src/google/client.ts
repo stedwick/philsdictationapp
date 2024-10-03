@@ -45,10 +45,10 @@ function startRecording() {
         numberOfAudioChannels: 1, // mono
         bufferSize: 16384,
         audioBitsPerSecond: 16000,
-        ondataavailable: function (blob) {
+        ondataavailable: async function (blob) {
           // This callback gives you blobs every second
           console.log('New audio blob available');
-          socket.send(blob);
+          socket.send(await blob.arrayBuffer());
         }
       });
       recorder.startRecording();
