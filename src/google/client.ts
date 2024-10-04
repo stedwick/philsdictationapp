@@ -42,23 +42,9 @@ function startRecording() {
     .getUserMedia({ audio: true })
     .then((newStream) => {
       stream = newStream;
-      mediaRecorder = new MediaRecorder(newStream);
-      // recorder = new RecordRTC(stream, {
-      //   type: 'audio',
-      //   mimeType: 'audio/webm',
-      //   recorderType: RecordRTC.StereoAudioRecorder,
-      //   timeSlice: 1000, // Optional: get blob every second
-      //   desiredSampRate: 16000,
-      //   numberOfAudioChannels: 1, // mono
-      //   bufferSize: 16384,
-      //   audioBitsPerSecond: 16000,
-      //   ondataavailable: async function (blob) {
-      //     // This callback gives you blobs every second
-      //     console.log('New audio blob available');
-      //     socket.send(await blob.arrayBuffer());
-      //   }
-      // });
-      // recorder.startRecording();
+      mediaRecorder = new MediaRecorder(newStream, {
+        mimeType: "audio/webm;codecs=opus",
+      });
 
       mediaRecorder.ondataavailable = async (event) => {
         if (event.data.size > 0 && socket.readyState === WebSocket.OPEN) {
@@ -66,7 +52,7 @@ function startRecording() {
         }
       };
 
-      mediaRecorder.start(1000); // Send audio data every 100ms
+      mediaRecorder.start(1000); // Send audio data every 1000ms (1 second)
     })
     .catch((error) => console.error("Error accessing microphone:", error));
 }
