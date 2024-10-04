@@ -39,11 +39,19 @@ function startStreaming() {
 
 function startRecording() {
   navigator.mediaDevices
-    .getUserMedia({ audio: true })
+    .getUserMedia({
+      audio: {
+        channelCount: 1,
+        sampleRate: 48000,
+        sampleSize: 16,
+        volume: 1.0,
+      },
+    })
     .then((newStream) => {
       stream = newStream;
       mediaRecorder = new MediaRecorder(newStream, {
         mimeType: "audio/webm;codecs=opus",
+        audioBitsPerSecond: 128000,
       });
 
       mediaRecorder.ondataavailable = async (event) => {

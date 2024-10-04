@@ -12,20 +12,65 @@ const speechClient = new speech.SpeechClient({
 
 const wss = new WebSocketServer({ port: 8080 });
 
-wss.on("connection", function connection(ws) {
+// Function to create or update a phrase set
+async function createOrUpdatePhraseSet() {
+  const phraseSetId = "custom-vocabulary";
+  const phraseSetName = `projects/${GOOGLE_PROJECT_ID}/locations/global/phraseSets/${phraseSetId}`;
+
+  const phrases = [
+    { value: "Fanita", boost: 20 },
+    { value: "Syncta", boost: 20 },
+    { value: "SentryPlus", boost: 20 },
+    { value: "I work at Syncta", boost: 20 },
+    { value: "my coworker Fanita", boost: 20 },
+    { value: "the SentryPlus project", boost: 20 },
+    // Add or modify phrases here as needed
+  ];
+
+  try {
+    // Try to update the existing phrase set
+    const [updatedPhraseSet] = await speechClient.updatePhraseSet({
+      phraseSet: {
+        name: phraseSetName,
+        phrases: phrases,
+      },
+      updateMask: {
+        paths: ["phrases"],
+      },
+    });
+    console.log(`Updated phrase set: ${updatedPhraseSet.name}`);
+    return updatedPhraseSet.name;
+  } catch (error) {
+    throw error;
+  }
+}
+
+wss.on("connection", async function connection(ws) {
   console.log("New WebSocket connection");
 
   let recognizeStream;
+  let phraseSetName;
+  phraseSetName = `projects/${GOOGLE_PROJECT_ID}/locations/global/phraseSets/custom-vocabulary`;
+
+  try {
+    await createOrUpdatePhraseSet();
+  } catch (error) {
+    console.error("Error creating/updating phrase set:", JSON.stringify(error));
+    phraseSetName = `projects/${GOOGLE_PROJECT_ID}/locations/global/phraseSets/custom-vocabulary`;
+  }
 
   function createStreamingRecognize() {
     const recognitionConfig = {
       autoDecodingConfig: {},
       languageCodes: ["en-US"],
-      model: "long",
+      model: "latest_long",
       features: {
         enableAutomaticPunctuation: true,
         enableSpokenPunctuation: true,
         enableSpokenEmojis: true,
+      },
+      adaptation: {
+        phraseSets: [{ phraseSet: phraseSetName }],
       },
     };
 
@@ -45,9 +90,7 @@ wss.on("connection", function connection(ws) {
       ._streamingRecognize()
       .on("error", (error) => {
         console.error("Error from Google Speech API:", JSON.stringify(error));
-        // Recreate the stream on error
-        throw error;
-        // createStreamingRecognize();
+        createStreamingRecognize();
       })
       .on("data", (data) => {
         console.log(
@@ -68,7 +111,6 @@ wss.on("connection", function connection(ws) {
         console.log("Google Speech API stream ended");
       });
 
-    // Send the initial configuration
     recognizeStream.write(streamingRecognizeRequest);
     console.log("Initial configuration sent to Google Speech API");
   }
