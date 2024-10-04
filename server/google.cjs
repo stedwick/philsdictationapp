@@ -21,9 +21,6 @@ async function createOrUpdatePhraseSet() {
     { value: "Fanita", boost: 20 },
     { value: "Syncta", boost: 20 },
     { value: "SentryPlus", boost: 20 },
-    { value: "I work at Syncta", boost: 20 },
-    { value: "my coworker Fanita", boost: 20 },
-    { value: "the SentryPlus project", boost: 20 },
     // Add or modify phrases here as needed
   ];
 
@@ -45,18 +42,94 @@ async function createOrUpdatePhraseSet() {
   }
 }
 
+// New function to create or update a custom class
+async function createOrUpdateCustomClass() {
+  const customClassId = "custom-vocabulary-class";
+  const customClassName = `projects/${GOOGLE_PROJECT_ID}/locations/global/customClasses/${customClassId}`;
+
+  const items = [
+    { value: "Fanita" },
+    { value: "Syncta" },
+    { value: "SentryPlus" },
+  ];
+
+  try {
+    // Try to update the existing custom class
+    const [updatedCustomClass] = await speechClient.updateCustomClass({
+      customClass: {
+        name: customClassName,
+        items: items,
+      },
+      updateMask: {
+        paths: ["items"],
+      },
+    });
+    console.log(`Updated custom class: ${updatedCustomClass.name}`);
+    return updatedCustomClass.name;
+  } catch (error) {
+    if (error.code === 5) {
+      // 5 is the error code for NOT_FOUND
+      // If the custom class doesn't exist, create a new one
+      const [newCustomClass] = await speechClient.createCustomClass({
+        parent: `projects/${GOOGLE_PROJECT_ID}/locations/global`,
+        customClassId: customClassId,
+        customClass: {
+          items: items,
+        },
+      });
+      console.log(`Created new custom class: ${newCustomClass.name}`);
+      return newCustomClass.name;
+    } else {
+      // If it's a different error, throw it
+      throw error;
+    }
+  }
+}
+
+// New function to get the custom class
+async function getCustomClass() {
+  const customClassId = "custom-vocabulary-class";
+  const customClassName = `projects/${GOOGLE_PROJECT_ID}/locations/global/customClasses/${customClassId}`;
+
+  try {
+    const [customClass] = await speechClient.getCustomClass({
+      name: customClassName,
+    });
+    console.log(`Retrieved custom class: ${customClass.name}`);
+    return customClass;
+  } catch (error) {
+    if (error.code === 5) {
+      // 5 is the error code for NOT_FOUND
+      console.log(`Custom class ${customClassId} not found.`);
+      return null;
+    } else {
+      console.error("Error retrieving custom class:", error);
+      throw error;
+    }
+  }
+}
+
 wss.on("connection", async function connection(ws) {
   console.log("New WebSocket connection");
 
   let recognizeStream;
   let phraseSetName;
+  let customClassName;
+
   phraseSetName = `projects/${GOOGLE_PROJECT_ID}/locations/global/phraseSets/custom-vocabulary`;
 
   try {
-    await createOrUpdatePhraseSet();
+    // await createOrUpdatePhraseSet();
+    customClassName = await getCustomClass();
+    if (!customClassName) {
+      console.log("Custom class not found. Creating a new one...");
+      // customClassName = await createOrUpdateCustomClass();
+    }
   } catch (error) {
-    console.error("Error creating/updating phrase set:", JSON.stringify(error));
-    phraseSetName = `projects/${GOOGLE_PROJECT_ID}/locations/global/phraseSets/custom-vocabulary`;
+    console.error(
+      "Error creating/updating phrase set or custom class:",
+      JSON.stringify(error)
+    );
   }
 
   function createStreamingRecognize() {
@@ -71,6 +144,7 @@ wss.on("connection", async function connection(ws) {
       },
       adaptation: {
         phraseSets: [{ phraseSet: phraseSetName }],
+        customClasses: [customClassName],
       },
     };
 
