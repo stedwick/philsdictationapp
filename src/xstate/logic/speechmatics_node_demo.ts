@@ -1,25 +1,62 @@
+import { EventObject, fromCallback } from "xstate";
 import { RealtimeClient } from '@speechmatics/real-time-client';
 
-const client = new RealtimeClient();
+type SpeechmaticsEvents = 
+  | { type: "start" }
+  | { type: "stop" }
+  | { type: "hear", result: { text: string, isFinal: boolean } }
+  | { type: "turnOff" };
 
-let finalText = '';
+export default fromCallback<SpeechmaticsEvents>(({ sendBack }) => {
+  const client = new RealtimeClient();
+  let cleanup: (() => void) | null = null;
+  
+  // Set up client event listeners
+  client.addEventListener('receiveMessage', ({ data }) => {
+    if (data.message === 'AddPartialTranscript') {
+      const text = data.results
+        .map((r) => r.alternatives?.[0].content)
+        .join(' ');
+      sendBack({ 
+        type: "hear", 
+        result: { text, isFinal: false }
+      });
+    } else if (data.message === 'AddTranscript') {
+      const text = data.results
+        .map((r) => r.alternatives?.[0].content)
+        .join(' ');
+      sendBack({ 
+        type: "hear", 
+        result: { text, isFinal: true }
+      });
+    } else if (data.message === 'EndOfTranscript') {
+      sendBack({ type: "turnOff" });
+    }
+  });
 
-client.addEventListener('receiveMessage', ({ data }) => {
-  if (data.message === 'AddPartialTranscript') {
-    const partialText = data.results
-      .map((r) => r.alternatives?.[0].content)
-      .join(' ');
-    console.log(`\r${finalText} \x1b[3m${partialText}\x1b[0m`);
-  } else if (data.message === 'AddTranscript') {
-    const text = data.results.map((r) => r.alternatives?.[0].content).join(' ');
-    finalText += text;
-    console.log(`\r${finalText}`);
-  } else if (data.message === 'EndOfTranscript') {
-    console.log('\nEND\n');
-  }
+  // Handle events from the state machine
+  return {
+    async receive(event) {
+      if (event.type === "start") {
+        try {
+          cleanup = await transcribeMicrophoneRealTime(client);
+        } catch (error) {
+          console.error('Speechmatics error:', error);
+          sendBack({ type: "turnOff" });
+        }
+      } else if (event.type === "stop") {
+        cleanup?.();
+        cleanup = null;
+      }
+    },
+    dispose() {
+      cleanup?.();
+    }
+  };
 });
 
-async function transcribeMicrophoneRealTime() {
+// Helper function moved inside the module
+async function transcribeMicrophoneRealTime(client: RealtimeClient) {
   // curl -L -X POST "https://mp.speechmatics.com/v1/api_keys?type=rt"      -H "Content-Type: application/json"      -H "Authorization: Bearer $SPEECHMATICS_API_KEY"      -d '{"ttl": 86400, "client_ref": "USER123"}'
   const jwt = "";
   // Get microphone stream
@@ -99,7 +136,3 @@ async function transcribeMicrophoneRealTime() {
     workletNode.disconnect();
   };
 }
-
-// Example usage (replace 'YOUR_JWT_HERE' with actual JWT)
-// transcribeMicrophoneRealTime(jwt).catch(console.error);
-export default transcribeMicrophoneRealTime;
