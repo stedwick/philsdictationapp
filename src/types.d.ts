@@ -7,6 +7,7 @@ declare global {
   interface Window {
     taterRef: AnyActorRef;
     regex: RegExp;
+    transcribeMicrophoneRealTime: function;
   }
 }
 
