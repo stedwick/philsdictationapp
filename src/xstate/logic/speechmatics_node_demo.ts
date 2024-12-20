@@ -31,7 +31,14 @@ async function transcribeMicrophoneRealTime() {
   // Create AudioContext to process the stream
   const audioContext = new AudioContext();
   const source = audioContext.createMediaStreamSource(stream);
-  const processor = audioContext.createScriptProcessor(4096, 1, 1);
+  
+  // Add AudioWorklet
+  await audioContext.audioWorklet.addModule('/audio-processor.js');
+  const workletNode = new AudioWorkletNode(audioContext, 'audio-processor');
+  
+  workletNode.port.onmessage = (event) => {
+    client.sendAudio(event.data);
+  };
 
   await client.start(jwt, {
     transcription_config: {
@@ -80,22 +87,16 @@ async function transcribeMicrophoneRealTime() {
     },
   });
 
-  // Process audio data
-  processor.onaudioprocess = (e) => {
-    const inputData = e.inputBuffer.getChannelData(0);
-    client.sendAudio(inputData);
-  };
-
   // Connect the audio nodes
-  source.connect(processor);
-  processor.connect(audioContext.destination);
+  source.connect(workletNode);
+  workletNode.connect(audioContext.destination);
 
   // Add cleanup function
   return () => {
     client.stopRecognition();
     stream.getTracks().forEach(track => track.stop());
     source.disconnect();
-    processor.disconnect();
+    workletNode.disconnect();
   };
 }
 
