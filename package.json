@@ -12,6 +12,7 @@
   "dependencies": {
     "@heroicons/react": "^2.0.18",
     "@mariojgt/wind-notify": "^0.1.2",
+    "@speechmatics/real-time-client": "^5.0.6",
     "@tauri-apps/api": "^1.5.1",
     "@uidotdev/usehooks": "^2.4.1",
     "@xstate/cli": "^0.5.17",
