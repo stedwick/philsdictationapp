@@ -12,24 +12,53 @@ const speechmaticsLogic = fromCallback<SpeechmaticsEvents>(
     const client = new RealtimeClient();
     let cleanup: (() => void) | null = null;
 
+    // Here's the thing: the punctuation machine requires the full final
+    // transcript, but Speechmatics returns one word at a time -- returning
+    // "question" and then "mark" does not get recognized as a "?" I am
+    // attempting to debounce the final transcript to get the full sentence at
+    // once.
+    let finals: string[] = [];
+    let partials: string[] = [];
+    let currentPartial: string = "";
+    let finalTimeoutId: ReturnType<typeof setTimeout>;
+    const sendBackFinalsDebounced = (text: string) => {
+      if (!text.trim()) return;
+      clearTimeout(finalTimeoutId);
+      finals.push(text);
+      partials.push(text);
+      finalTimeoutId = setTimeout(() => {
+        sendBack({
+          type: "hear",
+          result: { text: finals.join(" ").trim(), isFinal: true },
+        });
+        finals = [];
+        partials = [];
+        sendBackPartialsDebounced(currentPartial);
+      }, 1000);
+    };
+    const sendBackPartialsDebounced = (text: string) => {
+      if (!text.trim()) return;
+      if (text === currentPartial) return;
+      currentPartial = text;
+      const allPartialText = (partials.join(" ") + " " + currentPartial).trim();
+      sendBack({
+        type: "hear",
+        result: { text: " " + allPartialText, isFinal: false },
+      });
+    };
+
     // Set up client event listeners
     client.addEventListener("receiveMessage", ({ data }) => {
       if (data.message === "AddPartialTranscript") {
-        const text = " " + data.metadata.transcript;
+        const text = data.metadata.transcript.trim();
         // console.log("Speechmatics message: ", data);
         // console.log("Partial transcript: ", text);
-        sendBack({
-          type: "hear",
-          result: { text, isFinal: false },
-        });
+        sendBackPartialsDebounced(text);
       } else if (data.message === "AddTranscript") {
-        const text = data.metadata.transcript;
+        const text = data.metadata.transcript.trim();
         // console.log("Speechmatics message: ", data);
         // console.log("Final transcript: ", text);
-        sendBack({
-          type: "hear",
-          result: { text, isFinal: true },
-        });
+        sendBackFinalsDebounced(text);
       } else if (data.message === "EndOfTranscript") {
         sendBack({ type: "turnOff" });
       }
@@ -109,15 +138,24 @@ async function transcribeMicrophoneRealTime(client: RealtimeClient) {
         {
           content: "Zach",
         },
+        {
+          content: "comma",
+        },
+        {
+          content: "period",
+        },
       ],
       operating_point: "enhanced",
-      max_delay_mode: "flexible",
+      max_delay_mode: "fixed",
       max_delay: 2,
       enable_partials: true,
       enable_entities: true,
       output_locale: "en-US",
       transcript_filtering_config: {
         remove_disfluencies: true,
+      },
+      punctuation_overrides: {
+        permitted_marks: [],
       },
     },
     audio_format: {
