@@ -3,16 +3,17 @@ import { loadConfig, saveConfig } from "./actions/config";
 import cutText from "./actions/cut_text";
 import { loadSavedText, saveText } from "./actions/save_and_load";
 import { selectNewText, writeTextarea } from "./actions/textarea";
-import { turnMicOn } from "./actions/turn_mic_on";
+// import { turnMicOn } from "./actions/turn_mic_on";
 import { aTextareaEl } from "./assigns/init";
 import { aTextareaCurrentValues } from "./assigns/textarea";
 import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import { punctuationMachine } from "./logic/punctuation_machine";
-import speechAPILogic from "./logic/speech_api_callback";
+// import speechAPILogic from "./logic/speech_api_callback";
+import { isMobile } from "./helpers/mobile";
+import { speechmaticsLogic } from "./logic/speechmatics_callback";
 import textareaLogic from "./logic/textarea_callback";
 import windowLogic from "./logic/window_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
-import { isMobile } from "./helpers/mobile";
 
 const debugLog = false; // import.meta.env.VITE_DEBUG;
 
@@ -32,24 +33,31 @@ export const taterMachine = setup({
     cutText: ({ context: { textareaEl } }) => cutText(textareaEl),
     // MAYBE: resetMic? Occasionally the web speech API sends interim results
     // but never a final result, so Tater gets stuck with highlighted text.
-    turnMicOn,
-    turnMicOff: ({ context: { recognition } }) => recognition!.stop(),
-    checkSpeechResult: function () { },
-    checkForVoiceCommand: function () { },
-    setVoiceCommand: function () { },
-    execCmd: function () { },
-    resetSpeechCycle: function () { },
-    focus: ({ context: { textareaEl } }) => { if (isMobile) return; textareaEl.blur(); textareaEl.focus() },
-    logHeard: ({ event }) => debugLog && console.log(`heard: ${event.result[0].transcript}`),
+    turnMicOn: ({ context: { speechApiActor } }) =>
+      speechApiActor!.send({ type: "start" }),
+    turnMicOff: ({ context: { speechApiActor } }) =>
+      speechApiActor!.send({ type: "stop" }),
+    checkSpeechResult: function () {},
+    checkForVoiceCommand: function () {},
+    setVoiceCommand: function () {},
+    execCmd: function () {},
+    resetSpeechCycle: function () {},
+    focus: ({ context: { textareaEl } }) => {
+      if (isMobile) return;
+      textareaEl.blur();
+      textareaEl.focus();
+    },
+    logHeard: ({ event }) =>
+      debugLog && console.log(`heard: ${event.result.text}`),
     logNewText: ({ context: { newText } }) => console.log(`heard: ${newText}`),
   },
   actors: {
     initSpeechAPILogic,
-    speechAPILogic,
+    speechAPILogic: speechmaticsLogic,
     textareaLogic,
     windowLogic,
     punctuationMachine,
-    voiceCommandMachine: fromPromise(async function () { }),
+    voiceCommandMachine: fromPromise(async function () {}),
   },
   guards: {
     isAwake: function () {
@@ -72,7 +80,11 @@ export const taterMachine = setup({
     isSleepCommand: function () {
       return true;
     },
-    isAutoMic: ({ context: { config: { autoMic } } }) => autoMic,
+    isAutoMic: ({
+      context: {
+        config: { autoMic },
+      },
+    }) => autoMic,
   },
 }).createMachine({
   context: ({ input }) => ({
@@ -103,11 +115,11 @@ export const taterMachine = setup({
           actions: [
             assign({ recognition: ({ event }) => event.output }),
             assign({
-              speechApiActor: ({ context, spawn }) => {
-                const recognition = context.recognition!;
+              speechApiActor: ({ spawn }) => {
+                // const recognition = context.recognition!;
                 return spawn("speechAPILogic", {
                   id: "speechAPIMachine",
-                  input: { recognition },
+                  // input: { recognition },
                 });
               },
               textareaActor: ({ context: { textareaEl }, spawn }) => {
@@ -116,7 +128,8 @@ export const taterMachine = setup({
                   input: { textareaEl },
                 });
               },
-              windowActor: ({ spawn }) => spawn("windowLogic", { id: "windowMachine", }),
+              windowActor: ({ spawn }) =>
+                spawn("windowLogic", { id: "windowMachine" }),
             }),
           ],
           target: "initialized",
@@ -125,7 +138,7 @@ export const taterMachine = setup({
       },
     },
     errored: {
-      type: "final"
+      type: "final",
     },
     initialized: {
       initial: "off",
@@ -139,10 +152,7 @@ export const taterMachine = setup({
           ],
         },
         textareaInputEvent: {
-          actions: [
-            assign(aTextareaCurrentValues),
-            { type: "saveText" }
-          ]
+          actions: [assign(aTextareaCurrentValues), { type: "saveText" }],
         },
         setConfig: {
           actions: [
@@ -150,11 +160,11 @@ export const taterMachine = setup({
               config: ({ context: { config }, event }) => {
                 config[event.key] = event.value;
                 return config;
-              }
+              },
             }),
-            { type: "saveConfig" }
-          ]
-        }
+            { type: "saveConfig" },
+          ],
+        },
       },
       states: {
         off: {
@@ -163,7 +173,7 @@ export const taterMachine = setup({
             autoOn: {
               target: "on",
               guard: "isAutoMic",
-            }
+            },
           },
         },
         on: {
@@ -177,30 +187,27 @@ export const taterMachine = setup({
               // Should Sleep listen in the background? I think I want another config option for listening in the background.
               // [Sleep] Listen in the background
               // guard: "isAutoMic",
-            }
+            },
           },
           states: {
             asleep: {
               entry: assign({ micState: "asleep" }),
               on: {
-                wake: { target: "awake", },
+                wake: { target: "awake" },
                 autoOn: {
                   target: "awake",
                   guard: "isAutoMic",
                 },
                 hear: {
                   target: "hearingWhileAsleep",
-                  actions: { type: "logHeard" }
+                  actions: { type: "logHeard" },
                 },
               },
               // MAYBE: [Sleep] Implement asleep state
               always: { target: "#Tater.initialized.off" },
             },
             awake: {
-              entry: [
-                assign({ micState: "awake" }),
-                { type: "focus" }
-              ],
+              entry: [assign({ micState: "awake" }), { type: "focus" }],
               after: { 15000: { target: "asleep" } },
               on: {
                 sleep: { target: "asleep" },
@@ -209,9 +216,9 @@ export const taterMachine = setup({
                   actions: [
                     assign(({ event }) => ({
                       newResult: event.result,
-                      newText: event.result[0].transcript,
+                      newText: event.result.text,
                     })),
-                    { type: "logHeard", }
+                    { type: "logHeard" },
                   ],
                 },
               },
@@ -259,21 +266,23 @@ export const taterMachine = setup({
             punctuating: {
               invoke: {
                 src: "punctuationMachine",
-                input: ({ context: { textareaCurrentValues, newText } }) => (
-                  {
-                    before: textareaCurrentValues.beforeSelection,
-                    text: newText || "",
-                    after: textareaCurrentValues.afterSelection
-                  }),
+                input: ({ context: { textareaCurrentValues, newText } }) => ({
+                  before: textareaCurrentValues.beforeSelection,
+                  text: newText || "",
+                  after: textareaCurrentValues.afterSelection,
+                }),
                 onDone: {
                   actions: [
                     assign({ newText: ({ event }) => event.output }),
-                    ({ event }) => console.log("punctuated: [", event.output, "]"),
+                    ({ event }) =>
+                      console.log("punctuated: [", event.output, "]"),
                   ],
                   target: "writing",
                 },
                 onError: {
-                  actions: assign({ newText: ({ context }) => context.newText || "" }),
+                  actions: assign({
+                    newText: ({ context }) => context.newText || "",
+                  }),
                   target: "writing",
                 },
               },
@@ -285,7 +294,7 @@ export const taterMachine = setup({
                     beforeSelection: null,
                     selection: context.newText,
                     afterSelection: null,
-                  })
+                  }),
                 }),
                 { type: "writeTextarea" },
                 // Blurring and then refocusing scrolls the text into view if it's past the bottom of the text area.
@@ -296,18 +305,18 @@ export const taterMachine = setup({
               always: [
                 {
                   target: "selectingNewText",
-                  guard: { type: "isInterimResult" }
+                  guard: { type: "isInterimResult" },
                 },
                 {
                   target: "saving",
-                  guard: { type: "isFinalResult" }
+                  guard: { type: "isFinalResult" },
                 },
               ],
             },
             selectingNewText: {
               entry: [
                 { type: "selectNewText" },
-                raise({ type: "textareaInputEvent" })
+                raise({ type: "textareaInputEvent" }),
               ],
               always: { target: "saving" },
             },

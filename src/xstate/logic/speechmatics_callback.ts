@@ -15,9 +15,9 @@ const speechmaticsLogic = fromCallback<SpeechmaticsEvents>(
     // Set up client event listeners
     client.addEventListener("receiveMessage", ({ data }) => {
       if (data.message === "AddPartialTranscript") {
-        const text = data.metadata.transcript;
+        const text = " " + data.metadata.transcript;
         // console.log("Speechmatics message: ", data);
-        console.log("Partial transcript: ", text);
+        // console.log("Partial transcript: ", text);
         sendBack({
           type: "hear",
           result: { text, isFinal: false },
@@ -25,7 +25,7 @@ const speechmaticsLogic = fromCallback<SpeechmaticsEvents>(
       } else if (data.message === "AddTranscript") {
         const text = data.metadata.transcript;
         // console.log("Speechmatics message: ", data);
-        console.log("Final transcript: ", text);
+        // console.log("Final transcript: ", text);
         sendBack({
           type: "hear",
           result: { text, isFinal: true },
