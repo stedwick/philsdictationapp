@@ -3,7 +3,7 @@ class AudioProcessor extends AudioWorkletProcessor {
     super();
   }
 
-  process(inputs, outputs, parameters) {
+  process(inputs, _outputs, _parameters) {
     const input = inputs[0][0];
     if (input) {
       this.port.postMessage(input);
@@ -12,4 +12,4 @@ class AudioProcessor extends AudioWorkletProcessor {
   }
 }
 
-registerProcessor('audio-processor', AudioProcessor); 
+registerProcessor("audio-processor", AudioProcessor);
