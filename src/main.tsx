@@ -4,8 +4,10 @@ import "regenerator-runtime/runtime";
 import App from "./App";
 import "./styles.css";
 import { taterMachineContext } from "./xstate/tater_machine_context";
-import transcribeMicrophoneRealTime from "./xstate/logic/speechmatics_callback";
-window.transcribeMicrophoneRealTime = transcribeMicrophoneRealTime;
+
+import { createActor } from "xstate";
+import { speechmaticsLogic } from "./xstate/logic/speechmatics_callback";
+window.speechmaticsActor = createActor(speechmaticsLogic);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
