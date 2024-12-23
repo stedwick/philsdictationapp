@@ -88,7 +88,7 @@ const speechmaticsLogic = fromCallback<SpeechmaticsEvents>(
 // Helper function moved inside the module
 async function transcribeMicrophoneRealTime(client: RealtimeClient) {
   // curl -L -X POST "https://mp.speechmatics.com/v1/api_keys?type=rt"      -H "Content-Type: application/json"      -H "Authorization: Bearer $SPEECHMATICS_API_KEY"      -d '{"ttl": 86400, "client_ref": "USER123"}'
-  const jwt = import.meta.env.VITE_SPEECHMATICS_JWT;
+  const jwt = localStorage.getItem("jwt") || "";
   console.log("JWT: ", jwt);
 
   // Get microphone stream
