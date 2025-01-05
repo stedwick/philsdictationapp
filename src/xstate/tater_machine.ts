@@ -10,7 +10,7 @@ import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import { punctuationMachine } from "./logic/punctuation_machine";
 // import speechAPILogic from "./logic/speech_api_callback";
 import { isMobile } from "./helpers/mobile";
-import { speechmaticsLogic } from "./logic/speechmatics_callback";
+import { azureSpeechLogic } from "./logic/azure_callback";
 import textareaLogic from "./logic/textarea_callback";
 import windowLogic from "./logic/window_callback";
 import { TaterContext, initialTaterContext } from "./types/tater_context";
@@ -37,11 +37,11 @@ export const taterMachine = setup({
       speechApiActor!.send({ type: "start" }),
     turnMicOff: ({ context: { speechApiActor } }) =>
       speechApiActor!.send({ type: "stop" }),
-    checkSpeechResult: function () {},
-    checkForVoiceCommand: function () {},
-    setVoiceCommand: function () {},
-    execCmd: function () {},
-    resetSpeechCycle: function () {},
+    checkSpeechResult: function () { },
+    checkForVoiceCommand: function () { },
+    setVoiceCommand: function () { },
+    execCmd: function () { },
+    resetSpeechCycle: function () { },
     focus: ({ context: { textareaEl } }) => {
       if (isMobile) return;
       textareaEl.blur();
@@ -53,11 +53,12 @@ export const taterMachine = setup({
   },
   actors: {
     initSpeechAPILogic,
-    speechAPILogic: speechmaticsLogic,
+    // speechAPILogic: speechmaticsLogic,
+    speechAPILogic: azureSpeechLogic,
     textareaLogic,
     windowLogic,
     punctuationMachine,
-    voiceCommandMachine: fromPromise(async function () {}),
+    voiceCommandMachine: fromPromise(async function () { }),
   },
   guards: {
     isAwake: function () {
