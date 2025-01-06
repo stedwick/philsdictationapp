@@ -20,6 +20,7 @@ const defaultPhrases = [
   "comma",
   "period"
 ];
+console.log(defaultPhrases);
 
 const azureSpeechLogic = fromCallback<AzureSpeechEvents>(({ receive, sendBack }) => {
   let recognizer: SpeechSDK.SpeechRecognizer;
