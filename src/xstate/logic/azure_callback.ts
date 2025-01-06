@@ -7,7 +7,8 @@ type AzureSpeechEvents =
   | { type: "hear"; result: { text: string; isFinal: boolean } }
   | { type: "turnOff" };
 
-const customPhrases = [
+// Default phrases if none are in localStorage
+const defaultPhrases = [
   "Syncta",
   "SentryPlus",
   "Nadeem",
@@ -30,6 +31,8 @@ const azureSpeechLogic = fromCallback<AzureSpeechEvents>(({ receive, sendBack })
       try {
         const subscriptionKey = localStorage.getItem("AZURE_SPEECH_KEY") || "";
         const serviceRegion = localStorage.getItem("AZURE_SPEECH_REGION") || "";
+        const storedPhrases = localStorage.getItem("CUSTOM_PHRASES");
+        const customPhrases: [string] = storedPhrases ? JSON.parse(storedPhrases) : defaultPhrases;
 
         if (!subscriptionKey || !serviceRegion) {
           console.error("Azure Speech credentials not found in localStorage");
