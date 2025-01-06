@@ -8,7 +8,6 @@ import { AnyMachineSnapshot } from "xstate";
 import { taterMachineContext } from "../xstate/tater_machine_context";
 import { useCallback, useEffect, useState } from "react";
 import { isMobile } from "../xstate/helpers/mobile";
-import { fetchJWT } from "../helpers/jwt";
 
 const micStateSelector = (state: AnyMachineSnapshot) => state.context.micState;
 const textareaValueSelector = (state: AnyMachineSnapshot) =>
@@ -118,9 +117,6 @@ export const Buttons = () => {
           {/*   Premium */}
           {/* </button> */}
         </a>
-        <button className="btn" onClick={() => fetchJWT()}>
-          JWT
-        </button>
       </div>
     </div>
   );

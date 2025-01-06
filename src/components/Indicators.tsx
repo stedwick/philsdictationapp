@@ -31,7 +31,7 @@ export default function Indicators() {
       <div className="form-control">
         <label className="label cursor-pointer pt-0 pl-0">
           <input type="checkbox" className="toggle toggle-sm toggle-primary" checked={isAutoMic && "checked"} onChange={setAutoMic} />
-          <span className="label-text ml-2">Auto-listen</span>
+          <span className="label-text ml-2">Auto-listen (Azure)</span>
         </label>
       </div>
 
