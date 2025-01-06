@@ -63,7 +63,7 @@ const azureSpeechLogic = fromCallback<AzureSpeechEvents>(({ receive, sendBack })
         speechConfig.enableDictation();
 
         // Handle continuous recognition
-        recognizer.recognized = (s: unknown, e: SpeechSDK.SpeechRecognitionEventArgs) => {
+        recognizer.recognized = (_: unknown, e: SpeechSDK.SpeechRecognitionEventArgs) => {
           if (e.result.text) {
             sendBack({
               type: "hear",
@@ -72,7 +72,7 @@ const azureSpeechLogic = fromCallback<AzureSpeechEvents>(({ receive, sendBack })
           }
         };
 
-        recognizer.recognizing = (s: unknown, e: SpeechSDK.SpeechRecognitionEventArgs) => {
+        recognizer.recognizing = (_: unknown, e: SpeechSDK.SpeechRecognitionEventArgs) => {
           if (e.result.text) {
             sendBack({
               type: "hear",
@@ -81,7 +81,7 @@ const azureSpeechLogic = fromCallback<AzureSpeechEvents>(({ receive, sendBack })
           }
         };
 
-        recognizer.canceled = (s: unknown, e: SpeechSDK.SpeechRecognitionCanceledEventArgs) => {
+        recognizer.canceled = (_: unknown, e: SpeechSDK.SpeechRecognitionCanceledEventArgs) => {
           console.log(`CANCELED: Reason=${e.reason}`);
           sendBack({ type: "turnOff" });
         };
