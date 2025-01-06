@@ -13,5 +13,15 @@ export default defineConfig(async () => ({
   server: {
     port: 1420,
     strictPort: true,
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          speech: ["microsoft-cognitiveservices-speech-sdk"],
+          xstate: ["xstate"]
+        }
+      }
+    }
   }
 }));
