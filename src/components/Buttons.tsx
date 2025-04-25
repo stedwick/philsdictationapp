@@ -1,115 +1,122 @@
 import {
   BellSnoozeIcon,
-  ClipboardDocumentListIcon,
-  ClipboardIcon,
   MicrophoneIcon,
-  PauseIcon,
-  PlayIcon,
   ScissorsIcon,
-  StopIcon,
 } from "@heroicons/react/24/solid";
-import { execCopy, execCut, execPasteToApp } from "../helpers/clipboard";
-import { LayoutGridIcon } from "lucide-react";
+import { YoutubeIcon } from "lucide-react";
+import { AnyMachineSnapshot } from "xstate";
+import { taterMachineContext } from "../xstate/tater_machine_context";
+import { useCallback, useEffect, useState } from "react";
+import { isMobile } from "../xstate/helpers/mobile";
 
-export const Buttons: React.FC<{
-  dictationState: string;
-  setDictationState: React.Dispatch<React.SetStateAction<any>>;
-  textareaRef: React.RefObject<HTMLTextAreaElement>;
-}> = ({ dictationState, setDictationState, textareaRef }) => {
-  const pauseEnabled = dictationState == "on" ? "" : "btn-disabled";
-  const stopEnabled =
-    dictationState == "on" || dictationState == "paused" ? "" : "btn-disabled";
-  const resumeEnabled = dictationState == "paused" ? "" : "hidden";
+const micStateSelector = (state: AnyMachineSnapshot) => state.context.micState;
+const textareaValueSelector = (state: AnyMachineSnapshot) =>
+  state.context.textareaCurrentValues.value;
+const textareaElSelector = (state: AnyMachineSnapshot) => state.context.textareaEl;
+
+export const Buttons = () => {
+  const taterRef = taterMachineContext.useActorRef();
+  const micState = taterMachineContext.useSelector(micStateSelector);
+  const textareaEl = taterMachineContext.useSelector(textareaElSelector) as HTMLTextAreaElement | null;
+
+  const textareaValue = taterMachineContext.useSelector(textareaValueSelector);
+  const cutEnabled = textareaValue ? "" : "btn-disabled";
+
+  // The following block prevents starting dictation while the textarea el is
+  // active. For some reason this causes problems on mobile.
+  const [textareaIsActive, setTextareaIsActive] = useState(false);
+  const handleTextareaFocus = useCallback(() => {
+    setTextareaIsActive(document.activeElement === textareaEl);
+  }, [textareaEl, setTextareaIsActive])
+
+  useEffect(function watchTextareaEl() {
+    if (isMobile && textareaEl) {
+      handleTextareaFocus();
+
+      ["focus", "blur"].forEach(
+        (event) => {
+          textareaEl.addEventListener(event, handleTextareaFocus);
+        }
+      );
+
+      return () => {
+        ["focus", "blur"].forEach(
+          (event) => {
+            textareaEl.removeEventListener(event, handleTextareaFocus);
+          }
+        );
+      }
+    }
+  }, [textareaEl, handleTextareaFocus]);
 
   return (
     <div className="flex flex-wrap justify-center lg:justify-between flex-col lg:flex-row gap-x-12 mb-2">
       <div className="flex flex-wrap justify-center gap-2">
-        {dictationState != "on" && !!resumeEnabled && (
-          <button
-            className="btn btn-outline btn-error"
-            onClick={() => setDictationState("on")}
-          >
-            <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>Start Dictating
-          </button>
-        )}
-        {dictationState == "on" && (
-          <button
-            className="btn btn-error relative"
-            onClick={() => setDictationState("off")}
-          >
-            <MicrophoneIcon className="h-6 w-6 animate-ping absolute left-4"></MicrophoneIcon>
-            <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>
-            Dictating...
-          </button>
-        )}
-        {!resumeEnabled && (
-          <button
-            className="btn btn-outline"
-            onClick={() => setDictationState("on")}
-          >
-            <BellSnoozeIcon className="h-6 w-6"></BellSnoozeIcon>Say "wake up"
-          </button>
-        )}
-        {!!resumeEnabled && (
-          <button
-            className={"btn btn-outline btn-warning " + pauseEnabled}
-            onClick={() => setDictationState("paused")}
-          >
-            <PauseIcon className="h-6 w-6"></PauseIcon>Pause
-          </button>
-        )}
-        {!resumeEnabled && (
-          <button
-            className={"btn btn-outline btn-success " + resumeEnabled}
-            onClick={() => setDictationState("on")}
-          >
-            <PlayIcon className="h-6 w-6"></PlayIcon>Resume
-          </button>
-        )}
+        <div className="group">
+          {micState == "off" && (
+            <button
+              className="btn btn-outline btn-error"
+              onClick={() => taterRef.send({ type: "turnOn" })}
+              disabled={textareaIsActive}
+            >
+              <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>Start
+              Dictating
+            </button>
+          )}
+          {micState == "awake" && (
+            <button
+              className="btn btn-error relative"
+              onClick={() => taterRef.send({ type: "turnOff" })}
+              disabled={textareaIsActive}
+            >
+              <MicrophoneIcon className="h-6 w-6 animate-ping absolute left-4"></MicrophoneIcon>
+              <MicrophoneIcon className="h-6 w-6"></MicrophoneIcon>
+              <span>Dictating...</span>
+              {/* <span className="hidden group-hover:inline">
+                Say "turn off"...
+              </span> */}
+            </button>
+          )}
+          {micState == "asleep" && (
+            <button
+              className="btn btn-outline"
+              onClick={() => taterRef.send({ type: "wake" })}
+              disabled={textareaIsActive}
+            >
+              <BellSnoozeIcon className="h-6 w-6"></BellSnoozeIcon>Say "wake up"
+            </button>
+          )}
+        </div>
         <button
-          className={"btn btn-outline btn-info " + stopEnabled}
-          onClick={() => setDictationState("off")}
+          className={"btn btn-outline " + cutEnabled}
+          onClick={() => taterRef.send({ type: "cut" })}
         >
-          <StopIcon className="h-6 w-6"></StopIcon>Stop
+          <ScissorsIcon className="h-6 w-6"></ScissorsIcon>Cut
         </button>
       </div>
 
       <div className="divider my-2 lg:hidden"></div>
 
       <div className="flex flex-wrap gap-2 justify-center">
-        {import.meta.env.VITE_WEB ? (
-          <a
-            href="https://www.microsoft.com/store/apps/9NTPHH45FFRN"
-            target="_blank"
-          >
-            <button className="btn btn-outline btn-secondary">
-              <LayoutGridIcon className="h-6 w-6"></LayoutGridIcon>
-              Download App
-            </button>
-          </a>
-        ) : (
-          <button
-            className="btn btn-outline btn-secondary"
-            onClick={() => {
-              execPasteToApp(textareaRef, setDictationState);
-            }}
-          >
-            <ClipboardDocumentListIcon className="h-6 w-6"></ClipboardDocumentListIcon>
-            Paste to app
+        {/* import.meta.env.VITE_WEB */}
+        <a
+          href="https://youtu.be/47E8MYEPQrI"
+          target="_blank"
+        >
+          <button className="btn">
+            <YoutubeIcon className="h-6 w-6"></YoutubeIcon>
+            1-minute tutorial
           </button>
-        )}
-        <button
-          className="btn btn-outline btn-primary"
-          onClick={() => execCopy(textareaRef, setDictationState)}
-        >
-          <ClipboardIcon className="h-6 w-6"></ClipboardIcon>Copy
-        </button>
-        <button
-          className="btn btn-outline"
-          onClick={() => execCut(textareaRef, setDictationState)}
-        >
-          <ScissorsIcon className="h-6 w-6"></ScissorsIcon>Cut
-        </button>
+          {/* <a */}
+          {/*   href="https://www.microsoft.com/store/apps/9NTPHH45FFRN" */}
+          {/*   target="_blank" */}
+          {/* > */}
+          {/* <button className="btn btn-outline btn-secondary"> */}
+          {/*   <LayoutGridIcon className="h-6 w-6"></LayoutGridIcon> */}
+          {/*   TODO: [Premium] with LemonSqueezy */}
+          {/*   Premium */}
+          {/* </button> */}
+        </a>
       </div>
     </div>
   );

@@ -1,3 +1,5 @@
+import punctuate from "./punctuation";
+
 type InsertOpts = {
   selectInsertedText?: boolean;
   allowEmptyString?: boolean;
@@ -74,7 +76,9 @@ export class TextareaUtils {
 
     const [beforeCursor, afterCursor] =
       this.valuesBeforeAndAfterCursorSelection();
-    this.textarea.value = beforeCursor + text + afterCursor;
+    const newText = beforeCursor + text + afterCursor;
+    const newTextPunctuated = punctuate(newText);
+    this.textarea.value = newTextPunctuated;
 
     const cursorPosition = beforeCursor.length + text.length;
     this.textarea.blur(); // to scroll to cursor position

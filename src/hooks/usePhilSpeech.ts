@@ -59,6 +59,16 @@ export function usePhilSpeech(
     return () => clearInterval(intervalId); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
   }, []);
 
+  // Rudimentary auto-mic based on window Focus gained and lost.
+  useEffect(() => {
+    window.addEventListener("focus", function() {
+      setDictationState("on");
+    });
+    window.addEventListener("blur", function() {
+      setDictationState("off");
+    });
+  }, []);
+
   // Controls the mic
   useEffect(() => {
     // user action
@@ -95,6 +105,15 @@ export function usePhilSpeech(
     }
     resetTranscript();
   }, [finalTranscript]);
+
+  // Grammar doesn't work?
+  // const recognition = SpeechRecognition.getRecognition();
+  // window.recognition = recognition;
+  // const grammar =
+  //   "#JSGF V1.0; grammar colors; public <color> = Syncta | Fanita ;";
+  // const speechRecognitionList = new webkitSpeechGrammarList();
+  // speechRecognitionList.addFromString(grammar, 0.5);
+  // recognition!.grammars = speechRecognitionList;
 
   return {
     transcript,
