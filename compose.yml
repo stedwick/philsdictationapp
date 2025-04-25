@@ -1,0 +1,33 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    command: npm run dev -- --host
+    develop:
+      watch:
+        # Sync source files
+        - path: ./src
+          action: sync
+          target: /app/src
+        # Sync public assets
+        - path: ./public
+          action: sync
+          target: /app/public
+        # Sync and restart for config files
+        - path: .
+          action: sync+restart
+          target: /app
+          include:
+            - "*.config.js"
+            - "*.config.ts"
+            - "tsconfig.*"
+            - ".env"
+            - "index.html"
+        # Rebuild for package management
+        - path: ./package.json
+          action: rebuild
+        - path: ./package-lock.json
+          action: rebuild
