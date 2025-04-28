@@ -3,21 +3,26 @@ import {
   MicrophoneIcon,
   ScissorsIcon,
 } from "@heroicons/react/24/solid";
-import { YoutubeIcon } from "lucide-react";
-import { AnyMachineSnapshot } from "xstate";
-import { taterMachineContext } from "../xstate/tater_machine_context";
+import { Wand2Icon, YoutubeIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { AnyMachineSnapshot } from "xstate";
+import { formatWithAI } from "../ai/markdown";
 import { isMobile } from "../xstate/helpers/mobile";
+import { taterMachineContext } from "../xstate/tater_machine_context";
 
 const micStateSelector = (state: AnyMachineSnapshot) => state.context.micState;
 const textareaValueSelector = (state: AnyMachineSnapshot) =>
   state.context.textareaCurrentValues.value;
-const textareaElSelector = (state: AnyMachineSnapshot) => state.context.textareaEl;
+const textareaElSelector = (state: AnyMachineSnapshot) =>
+  state.context.textareaEl;
 
 export const Buttons = () => {
   const taterRef = taterMachineContext.useActorRef();
   const micState = taterMachineContext.useSelector(micStateSelector);
-  const textareaEl = taterMachineContext.useSelector(textareaElSelector) as HTMLTextAreaElement | null;
+  const textareaEl = taterMachineContext.useSelector(
+    textareaElSelector
+  ) as HTMLTextAreaElement | null;
 
   const textareaValue = taterMachineContext.useSelector(textareaValueSelector);
   const cutEnabled = textareaValue ? "" : "btn-disabled";
@@ -27,27 +32,43 @@ export const Buttons = () => {
   const [textareaIsActive, setTextareaIsActive] = useState(false);
   const handleTextareaFocus = useCallback(() => {
     setTextareaIsActive(document.activeElement === textareaEl);
-  }, [textareaEl, setTextareaIsActive])
+  }, [textareaEl, setTextareaIsActive]);
 
-  useEffect(function watchTextareaEl() {
-    if (isMobile && textareaEl) {
-      handleTextareaFocus();
+  useEffect(
+    function watchTextareaEl() {
+      if (isMobile && textareaEl) {
+        handleTextareaFocus();
 
-      ["focus", "blur"].forEach(
-        (event) => {
+        ["focus", "blur"].forEach((event) => {
           textareaEl.addEventListener(event, handleTextareaFocus);
-        }
-      );
+        });
 
-      return () => {
-        ["focus", "blur"].forEach(
-          (event) => {
+        return () => {
+          ["focus", "blur"].forEach((event) => {
             textareaEl.removeEventListener(event, handleTextareaFocus);
-          }
-        );
+          });
+        };
       }
+    },
+    [textareaEl, handleTextareaFocus]
+  );
+
+  const handleAIClick = async () => {
+    try {
+      const formattedText = await formatWithAI(textareaValue);
+      if (textareaEl) {
+        textareaEl.value = formattedText;
+        // Trigger the textarea input event to update the state
+        taterRef.send({ type: "textareaInputEvent" });
+      }
+      toast.success("Text formatted successfully!");
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to format text"
+      );
     }
-  }, [textareaEl, handleTextareaFocus]);
+  };
 
   return (
     <div className="flex flex-wrap justify-center lg:justify-between flex-col lg:flex-row gap-x-12 mb-2">
@@ -93,16 +114,19 @@ export const Buttons = () => {
         >
           <ScissorsIcon className="h-6 w-6"></ScissorsIcon>Cut
         </button>
+        <button
+          className={"btn btn-outline " + cutEnabled}
+          onClick={handleAIClick}
+        >
+          <Wand2Icon className="h-6 w-6"></Wand2Icon>AI
+        </button>
       </div>
 
       <div className="divider my-2 lg:hidden"></div>
 
       <div className="flex flex-wrap gap-2 justify-center">
         {/* import.meta.env.VITE_WEB */}
-        <a
-          href="https://youtu.be/47E8MYEPQrI"
-          target="_blank"
-        >
+        <a href="https://youtu.be/47E8MYEPQrI" target="_blank">
           <button className="btn">
             <YoutubeIcon className="h-6 w-6"></YoutubeIcon>
             1-minute tutorial

@@ -6,10 +6,10 @@ import { selectNewText, writeTextarea } from "./actions/textarea";
 // import { turnMicOn } from "./actions/turn_mic_on";
 import { aTextareaEl } from "./assigns/init";
 import { aTextareaCurrentValues } from "./assigns/textarea";
+import { isMobile } from "./helpers/mobile";
 import initSpeechAPILogic from "./logic/init_speech_api_promise";
 import { punctuationMachine } from "./logic/punctuation_machine";
 // import speechAPILogic from "./logic/speech_api_callback";
-import { isMobile } from "./helpers/mobile";
 import { azureSpeechLogic } from "./logic/azure_callback";
 import textareaLogic from "./logic/textarea_callback";
 import windowLogic from "./logic/window_callback";
@@ -30,6 +30,7 @@ export const taterMachine = setup({
     loadSavedText,
     writeTextarea,
     selectNewText,
+    resetTextarea,
     cutText: ({ context: { textareaEl } }) => cutText(textareaEl),
     // MAYBE: resetMic? Occasionally the web speech API sends interim results
     // but never a final result, so Tater gets stuck with highlighted text.
@@ -37,11 +38,11 @@ export const taterMachine = setup({
       speechApiActor!.send({ type: "start" }),
     turnMicOff: ({ context: { speechApiActor } }) =>
       speechApiActor!.send({ type: "stop" }),
-    checkSpeechResult: function () { },
-    checkForVoiceCommand: function () { },
-    setVoiceCommand: function () { },
-    execCmd: function () { },
-    resetSpeechCycle: function () { },
+    checkSpeechResult: function () {},
+    checkForVoiceCommand: function () {},
+    setVoiceCommand: function () {},
+    execCmd: function () {},
+    resetSpeechCycle: function () {},
     focus: ({ context: { textareaEl } }) => {
       if (isMobile) return;
       textareaEl.blur();
@@ -58,7 +59,7 @@ export const taterMachine = setup({
     textareaLogic,
     windowLogic,
     punctuationMachine,
-    voiceCommandMachine: fromPromise(async function () { }),
+    voiceCommandMachine: fromPromise(async function () {}),
   },
   guards: {
     isAwake: function () {

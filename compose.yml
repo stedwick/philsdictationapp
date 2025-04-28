@@ -1,18 +1,17 @@
 services:
-  app:
+  tatertalk:
+    profiles:
+      - tatertalk
     build: .
-    environment:
-      - NODE_ENV=development
-    command: npm run dev -- --host
     labels:
-      - "traefik.http.services.dictation.loadbalancer.server.port=1420"
-      - "traefik.http.routers.dictation-http.rule=Host(`tatertalk.docker.localhost`)"
-      - "traefik.http.routers.dictation-http.entrypoints=web"
-      - "traefik.http.routers.dictation-http.service=dictation"
-      - "traefik.http.routers.dictation-https.rule=Host(`tatertalk.docker.localhost`)"
-      - "traefik.http.routers.dictation-https.entrypoints=websecure"
-      - "traefik.http.routers.dictation-https.tls=true"
-      - "traefik.http.routers.dictation-https.service=dictation"
+      - "traefik.http.services.tatertalk.loadbalancer.server.port=1420"
+      - "traefik.http.routers.tatertalk-http.rule=Host(`tatertalk.docker.localhost`)"
+      - "traefik.http.routers.tatertalk-http.entrypoints=web"
+      - "traefik.http.routers.tatertalk-http.service=tatertalk"
+      - "traefik.http.routers.tatertalk-https.rule=Host(`tatertalk.docker.localhost`)"
+      - "traefik.http.routers.tatertalk-https.entrypoints=websecure"
+      - "traefik.http.routers.tatertalk-https.tls=true"
+      - "traefik.http.routers.tatertalk-https.service=tatertalk"
     develop:
       watch:
         # Sync source files
@@ -38,8 +37,3 @@ services:
           action: rebuild
         - path: ./package-lock.json
           action: rebuild
-
-networks:
-  default:
-    external: true
-    name: traefik
