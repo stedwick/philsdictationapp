@@ -3,7 +3,7 @@ import {
   MicrophoneIcon,
   ScissorsIcon,
 } from "@heroicons/react/24/solid";
-import { Wand2Icon, YoutubeIcon } from "lucide-react";
+import { Loader2Icon, Wand2Icon, YoutubeIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { AnyMachineSnapshot } from "xstate";
@@ -23,9 +23,11 @@ export const Buttons = () => {
   const textareaEl = taterMachineContext.useSelector(
     textareaElSelector
   ) as HTMLTextAreaElement | null;
+  const [isAILoading, setIsAILoading] = useState(false);
 
   const textareaValue = taterMachineContext.useSelector(textareaValueSelector);
   const cutEnabled = textareaValue ? "" : "btn-disabled";
+  const aiEnabled = textareaValue && !isAILoading ? "" : "btn-disabled";
 
   // The following block prevents starting dictation while the textarea el is
   // active. For some reason this causes problems on mobile.
@@ -55,6 +57,7 @@ export const Buttons = () => {
 
   const handleAIClick = async () => {
     try {
+      setIsAILoading(true);
       const formattedText = await formatWithAI(textareaValue);
       if (textareaEl) {
         textareaEl.value = formattedText;
@@ -67,6 +70,8 @@ export const Buttons = () => {
       toast.error(
         error instanceof Error ? error.message : "Failed to format text"
       );
+    } finally {
+      setIsAILoading(false);
     }
   };
 
@@ -122,10 +127,16 @@ export const Buttons = () => {
         </button>
         {hasApiKey && (
           <button
-            className={"btn btn-outline " + cutEnabled}
+            className={`btn btn-outline ${aiEnabled}`}
             onClick={handleAIClick}
+            disabled={isAILoading}
           >
-            <Wand2Icon className="h-6 w-6"></Wand2Icon>AI
+            {isAILoading ? (
+              <Loader2Icon className="h-6 w-6 animate-spin" />
+            ) : (
+              <Wand2Icon className="h-6 w-6" />
+            )}
+            AI
           </button>
         )}
       </div>
