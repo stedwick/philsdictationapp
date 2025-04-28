@@ -1,0 +1,45 @@
+services:
+  app:
+    build: .
+    environment:
+      - NODE_ENV=development
+    command: npm run dev -- --host
+    labels:
+      - "traefik.http.services.dictation.loadbalancer.server.port=1420"
+      - "traefik.http.routers.dictation-http.rule=Host(`tatertalk.docker.localhost`)"
+      - "traefik.http.routers.dictation-http.entrypoints=web"
+      - "traefik.http.routers.dictation-http.service=dictation"
+      - "traefik.http.routers.dictation-https.rule=Host(`tatertalk.docker.localhost`)"
+      - "traefik.http.routers.dictation-https.entrypoints=websecure"
+      - "traefik.http.routers.dictation-https.tls=true"
+      - "traefik.http.routers.dictation-https.service=dictation"
+    develop:
+      watch:
+        # Sync source files
+        - path: ./src
+          action: sync
+          target: /app/src
+        # Sync public assets
+        - path: ./public
+          action: sync
+          target: /app/public
+        # Sync and restart for config files
+        - path: .
+          action: sync+restart
+          target: /app
+          include:
+            - "*.config.js"
+            - "*.config.ts"
+            - "tsconfig.*"
+            - ".env"
+            - "index.html"
+        # Rebuild for package management
+        - path: ./package.json
+          action: rebuild
+        - path: ./package-lock.json
+          action: rebuild
+
+networks:
+  default:
+    external: true
+    name: traefik
