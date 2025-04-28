@@ -70,6 +70,12 @@ export const Buttons = () => {
     }
   };
 
+  const hasApiKey = (() => {
+    const apiKey = localStorage.getItem("openrouter_api_key");
+    // OpenRouter API keys typically start with "sk-or-" and are at least 40 characters long
+    return apiKey && apiKey.startsWith("sk-or-") && apiKey.length >= 40;
+  })();
+
   return (
     <div className="flex flex-wrap justify-center lg:justify-between flex-col lg:flex-row gap-x-12 mb-2">
       <div className="flex flex-wrap justify-center gap-2">
@@ -114,12 +120,14 @@ export const Buttons = () => {
         >
           <ScissorsIcon className="h-6 w-6"></ScissorsIcon>Cut
         </button>
-        <button
-          className={"btn btn-outline " + cutEnabled}
-          onClick={handleAIClick}
-        >
-          <Wand2Icon className="h-6 w-6"></Wand2Icon>AI
-        </button>
+        {hasApiKey && (
+          <button
+            className={"btn btn-outline " + cutEnabled}
+            onClick={handleAIClick}
+          >
+            <Wand2Icon className="h-6 w-6"></Wand2Icon>AI
+          </button>
+        )}
       </div>
 
       <div className="divider my-2 lg:hidden"></div>
