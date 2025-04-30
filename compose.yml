@@ -1,4 +1,30 @@
 services:
+  proxy:
+    profiles:
+      - proxy
+    # The official v3 Traefik docker image
+    image: traefik:v3.3
+    # Enables the web UI and tells Traefik to listen to docker
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The HTTPS port
+      - "443:443"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+      # SSL certificate files
+      - ./.config/docker/certs:/etc/traefik/certs:ro
+      # Dynamic configuration
+      - ./.config/docker/dynamic:/etc/traefik/dynamic:ro
   tatertalk:
     profiles:
       - tatertalk
