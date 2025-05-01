@@ -1,5 +1,5 @@
 services:
-  proxy:
+  proxy-tatertalk:
     profiles:
       - proxy
     # The official v3 Traefik docker image
