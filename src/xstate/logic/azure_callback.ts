@@ -9,7 +9,6 @@ type AzureSpeechEvents =
 
 // Default phrases if none are in localStorage
 const defaultPhrases = ["Olio", "Aron", "comma", "period"];
-console.log(defaultPhrases);
 
 const azureSpeechLogic = fromCallback<AzureSpeechEvents>(
   ({ receive, sendBack }) => {
@@ -28,6 +27,7 @@ const azureSpeechLogic = fromCallback<AzureSpeechEvents>(
           const customPhrases: [string] = storedPhrases
             ? JSON.parse(storedPhrases)
             : defaultPhrases;
+          console.log(customPhrases);
 
           if (!subscriptionKey || !serviceRegion) {
             console.error("Azure Speech credentials not found in localStorage");
